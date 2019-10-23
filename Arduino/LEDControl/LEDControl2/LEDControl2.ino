@@ -77,6 +77,9 @@ void loop() {
     if ((!clockwise && index == 115) || (clockwise && index == 4)) {  // critical region is  where the player must jump to score max  points
       mySerial.write((byte)B11001111); // XY00ZZZZ  X -Player Id =1 for player 2, Y - 1 as LED , ZZZZ = 1's for crit. region
     }
+    else if ((clockwise && index == 115) || (!clockwise && index == 4)) {
+      mySerial.write((byte)B11001010); // XY00ZZZZ  X -Player Id =1 for player 1, Y - 1 as LED , ZZZZ = 1010's for exiting crit. region
+    }
     //if a gesture is detected, handle it
     if ( isr_flag == 1 ) { // if interrupt flag has been raised  to 1 = a gesture is detected
       detachInterrupt(0);
