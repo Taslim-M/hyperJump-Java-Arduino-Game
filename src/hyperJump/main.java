@@ -1,6 +1,5 @@
 package hyperJump;
 
-//Main
 public class main {
 	public static void main(String[] args) {
 		//Create new Serial Port Handler
