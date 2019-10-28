@@ -22,18 +22,8 @@ public class GameCoordinator {
 			ByteDecoder.DecodeMessage(b, player1State);// analyze the byte and update player1State
 			
 			//if the critical region has just been entered (less than 0.5 ms since it was read), print to console
-			if (System.currentTimeMillis() - player1State.timeLedCritical < 0.5) {
-				System.out.println("LED: Critical Region Entered");
-
-			}
-			if (System.currentTimeMillis() - player1State.timeJumpDetected < 0.5) { //if a jump is detected now
-				//if the jump is close to the critical region entry with a difference less than 1 second
-				if (Math.abs(player1State.timeJumpDetected - player1State.timeLedCritical) < 1000) {
-					System.out.println("Successful Jump"); // display success
-
-				} else {
-					System.out.println("Ooops!! missed the Jump");
-				}
+			if (player1State.hasJumped && player1State.shouldJump) { //if a jump is detected correctly
+				System.out.println("Great Jump");
 			}
 		}
 	}
