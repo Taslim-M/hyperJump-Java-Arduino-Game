@@ -9,7 +9,6 @@ public class State {
 		this.playerId = playerID;
 	}
 	//LED critical time represents the time when the stream of LEDs enter the bottom region of the loop
-	long timeLedCritical =0; //init LED Critical time and Jump Detected Time to 0
-	
-	long timeJumpDetected =0;
+	boolean shouldJump = false;
+	boolean hasJumped = false;
 }
