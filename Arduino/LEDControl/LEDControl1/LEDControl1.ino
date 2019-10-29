@@ -105,9 +105,9 @@ void loop() {
 //Light up 7 LEDS at index and reset for next iteration
 //CRGB( GREEN, RED , BLUE )
 void lightLED(int index) { // takes the index and turns the led of the index and 3 leds before and after the index to Deep Red
-  fill_solid( leds, NUM_LEDS, CRGB(224, 176, 230));
+  fill_solid( leds, NUM_LEDS, CRGB(10, 150, 10)); // pink background
   for (int k = index - 3; k <= index + 3; k++) {
-    leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB(0, 255, 0); // Deep RED
+    leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB(0, 0, 255); // Deep Blue
   }
 
   FastLED.show();// flushes the color on the led strip immediately
@@ -212,7 +212,7 @@ void preGameAnimation() {
     // Wait a little bit before we loop around and do it again
     delay(10);
   }
-  fill_solid( leds, NUM_LEDS, CRGB(10, 150, 10)); //Fill color after animation -> sets all LEDs to white
+  fill_solid( leds, NUM_LEDS, CRGB(224, 176, 230)); //Fill color after animation -> sets all LEDs to blue/white
   FastLED.show();
 }
 void fadeall() {
