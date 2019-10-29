@@ -4,13 +4,14 @@ public final class ByteDecoder {
 	// mask is used to infer whether sender device is an accelerometer or led strip
 	private static byte deviceIdMask = (byte) 0b01000000;
 	// mask to check enter or exit for LED
-	private static byte ledStripEntered = (byte) 0b0001111;
+	private static byte ledStripEntered = (byte) 0b0001000;
+	public static int scoreMultiplier =0;
 	// mask is used to infer whether the data send will be used to update the
 	// state of player 1 or 2
 	private static byte playerIdMask = (byte) 0b10000000;
 	// data mask is used to infer the message sent by the device;
 	private static byte dataMask = (byte) 0b00001111;
-
+	
 	// flags that are used to recogonize the sender device
 	private static boolean ledStripEnter, AccelerometerJump;
 	// stores the player number
@@ -24,6 +25,7 @@ public final class ByteDecoder {
 		if ((deviceIdMask & b) != 0) {
 			if ((ledStripEntered & b) != 0) { // if LED, check enter or not
 				ledStripEnter = true;
+				scoreMultiplier = (b&0b00001111);
 			}
 		} else {
 			AccelerometerJump = true;
@@ -58,6 +60,7 @@ public final class ByteDecoder {
 				// the loop is entered
 				s1.shouldJump = true;
 				s1.hasJumped = false; // reset any jump conditions
+				s1.scoreMultiplier = scoreMultiplier;
 
 			} else if (AccelerometerJump) { // if device is Accelerometer
 				// then store the time in timeJumpDetected-> time that a successful Jump has

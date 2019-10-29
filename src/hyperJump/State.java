@@ -11,4 +11,5 @@ public class State {
 	//LED critical time represents the time when the stream of LEDs enter the bottom region of the loop
 	boolean shouldJump = false;
 	boolean hasJumped = false;
+	int scoreMultiplier =0;
 }

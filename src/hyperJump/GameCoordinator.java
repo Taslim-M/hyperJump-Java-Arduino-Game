@@ -23,7 +23,9 @@ public class GameCoordinator {
 			
 			//if the critical region has just been entered (less than 0.5 ms since it was read), print to console
 			if (player1State.hasJumped && player1State.shouldJump) { //if a jump is detected correctly
-				System.out.println("Great Jump");
+				System.out.println("Great Jump Score added: " + player1State.scoreMultiplier);
+			}else if(player1State.hasJumped && !player1State.shouldJump) {
+				System.out.println("Wrong Jump");
 			}
 		}
 	}
