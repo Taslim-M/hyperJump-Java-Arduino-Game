@@ -76,9 +76,9 @@ void loop() {
 
     // in clockwise motion index 4= start of critical region and in anticlockwise motion index 115= critical region beginning
     if ((!clockwise && index == 115) || (clockwise && index == 4)) {  // critical region is  where the player must jump to score max  points
-      mySerial.write((byte)B01001111); // XY00ZZZZ  X -Player Id =0 for player 1, Y - 1 as LED , ZZZZ = 1's for enter crit. region
+      mySerial.write(getByteCode(speed)); // XY00ZZZZ  X -Player Id =0 for player 1, Y - 1 as LED , ZZZZ = 1's for enter crit. region
     }else if ((clockwise && index == 115) || (!clockwise && index == 4)){
-      mySerial.write((byte)B01001010); // XY00ZZZZ  X -Player Id =0 for player 1, Y - 1 as LED , ZZZZ = 1010's for exiting crit. region
+      mySerial.write((byte)B01000010); // XY00ZZZZ  X -Player Id =0 for player 1, Y - 1 as LED , ZZZZ = 1010's for exiting crit. region
     }
     //if a gesture is detected, handle it
     if ( isr_flag == 1 ) { // if interrupt flag has been raised  to 1 = a gesture is detected
@@ -160,6 +160,29 @@ void handleGesture() {
 }
 
 //****************************Functions********************************
+
+// 
+byte getByteCode(int speed) {
+if (speed== 10)
+	return (byte)B01001101;
+	
+	else if (speed==20)
+	return (byte)B01001100;
+	
+	else if (speed==30)
+	return (byte)B01001011;
+	
+	else if (speed==40)
+	return (byte)B01001010;
+	
+	else if (speed==50)
+	return (byte)B01001001;
+	
+	else if (speed==60)
+	return (byte)B01001000;
+	
+	
+}
 
 //Pre game animation
 void preGameAnimation() {
