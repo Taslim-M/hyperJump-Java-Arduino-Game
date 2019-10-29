@@ -67,6 +67,7 @@ void loop() {
     } else if (statusCode == B00000000) { //if Java sent 0 - game ended so stopLED
       gameStarted = false;
       preGameAnimation();
+      speed = 50;//reset speed for next game
     }
   }
   if (gameStarted) {
@@ -75,7 +76,7 @@ void loop() {
 
     // in clockwise motion index 4= start of critical region and in anticlockwise motion index 115= critical region beginning
     if ((!clockwise && index == 115) || (clockwise && index == 4)) {  // critical region is  where the player must jump to score max  points
-      mySerial.write((byte)B11001111); // XY00ZZZZ  X -Player Id =1 for player 2, Y - 1 as LED , ZZZZ = 1's for crit. region
+      mySerial.write(getByteCode(speed)); // XY00ZZZZ  X -Player Id =1 for player 2, Y - 1 as LED ,getByteCode- each speed has a code
     }
     else if ((clockwise && index == 115) || (!clockwise && index == 4)) {
       mySerial.write((byte)B11001010); // XY00ZZZZ  X -Player Id =1 for player 1, Y - 1 as LED , ZZZZ = 1010's for exiting crit. region
@@ -104,9 +105,11 @@ void loop() {
 //Light up 7 LEDS at index and reset for next iteration
 //CRGB( GREEN, RED , BLUE )
 void lightLED(int index) { // takes the index and turns the led of the index and 3 leds before and after the index to Deep Red
-  fill_solid( leds, NUM_LEDS, CRGB(224, 176, 230));
+  //fill_solid( leds, NUM_LEDS, CRGB(224, 176, 230)); // hot pink
+  fill_solid( leds, NUM_LEDS, CRGB(211, 211, 211)); // Light Grey
   for (int k = index - 3; k <= index + 3; k++) {
-    leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB(0, 50, 255); // Blue with a touch of red
+//    leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB(0, 50, 255); // Blue with a touch of red
+    leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB(255, 255, 0); // white with a touch of red
   }
 
   FastLED.show();// flushes the color on the led strip immediately
@@ -160,6 +163,26 @@ void handleGesture() {
 }
 
 //****************************Functions********************************
+
+byte getByteCode(int speed) {
+  if (speed == 10)
+    return (byte)B11001101;
+
+  else if (speed == 20)
+    return (byte)B11001100;
+
+  else if (speed == 30)
+    return (byte)B11001011;
+
+  else if (speed == 40)
+    return (byte)B11001010;
+
+  else if (speed == 50)
+    return (byte)B11001001;
+
+  else if (speed == 60)
+    return (byte)B11001000;
+}
 
 //Pre game animation
 void preGameAnimation() {
