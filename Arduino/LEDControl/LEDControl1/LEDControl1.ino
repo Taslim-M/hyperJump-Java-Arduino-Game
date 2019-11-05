@@ -18,11 +18,11 @@ int isr_flag = 0; //initial interrupt flag
 struct Context {
   char currentState = 'w';
   byte message;
-  int index = random(15, 100); //  selecting random position to start- ensure in non-critical region
-
+  int index = (rand() + 11) % (NUM_LEDS-5); //  selecting random position to start- ensure not in critical region
+  bool gameStarted = false; // to start Game when Java sends data
   int speed = 50; //starting speed
-  const int maxSpeed = 10; //maximize the speed by minimizing the  delay between transitions is 10 ms
-  const int minSpeed = 60; // minimize the speed by setting  delay to max value ->60msec
+  int maxSpeed = 10; //maximize the speed by minimizing the  delay between transitions is 10 ms
+  int minSpeed = 60; // minimize the speed by setting  delay to max value ->60msec
   int topFocusIndex = 58; //the index at top focal centre  of loop
   bool clockwise = false;
 };
@@ -83,61 +83,53 @@ void loop() {
 
   switch (LED_Context.currentState) {
     case 'w': // if current state is Pre Animation
-      if (LED_Context.message == B11111111) { // if game started signal received
-        LED_Context.currentState = 'n';      //  change current-state to non-critical region
+      if (LED_Context.message == B11111111) {
+        LED_Context.gameStarted = true;
+        LED_Context.currentState = 'n';
       }
       break;
 
     case 'n': // if current state is Pre Animation
       if (LED_Context.message == B00000000) { //if game ended signal received
-        LED_Context.currentState = 'o';  // change state to game over
+        LED_Context.currentState = 'o';
       }
-      else if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
+      else if (( LED_Context.index == 115) || (LED_Context.index == 4)) {
+        //light up 3 leds at the index
+        lightLED(LED_Context.index);
         /* XY00CDDD
             X -Player Id =0 for player 1
             Y = 1 for device is LED
             C= 1 for led inside critical region
             DDD = the getByte(int)function -> takes the speed, returns the appropriate data to send to the java
         */
-        mySerial.write(getByteCode(LED_Context.speed)); // broadcast message= entering critical region with a speed
-        LED_Context.currentState = 'c'; // change current-state to critical region
+        mySerial.write(getByteCode(LED_Context.speed));
+        LED_Context.currentState = 'c';
       }
-
-      //light up 3 leds at the index
-      lightLED(LED_Context.index);
       break;
 
     case 'c':// if current state is Critical
       if (LED_Context.message == B00000000) {  //if game ended signal received
-        LED_Context.currentState = 'o';  // change current-state to game over state
+        LED_Context.currentState = 'o';
       }
-      else  if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
-
+      else  if (( LED_Context.index < 115) || (LED_Context.index > 4)) {
+        //light up 3 leds at the index
+        lightLED(LED_Context.index);
         /* XY00CDDD
             X -Player Id =0 for player 1
             Y = 1 for device is LED
-            C= 0 for led outside critical region
+            C= 1 for led inside critical region
             DDD = 000 for LED outside the critical region
         */
-        mySerial.write((byte)B01000000);// broadcast  message= exiting critical region
-        LED_Context.currentState = 'n';// change current-state to non-critical region
+        mySerial.write((byte)B01000000);
+        LED_Context.currentState = 'n';
       }
-      //light up 3 leds at the index
-      lightLED(LED_Context.index);
       break;
 
     case 'o':
-
-      if (LED_Context.message == B00001111) { // B00001111-> another round needs to be played
-
-        resetConfiguration(); // reset configuration
-
-        LED_Context.currentState = 'w'; // change current state to wait to start state
-      }
-
-      else {
-        fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
-      }
+      fill_solid( leds, NUM_LEDS, CRGB(224, 176, 230)); //Fill color after animation -> sets all LEDs to blue/white
+      resetConfiguration();
+      LED_Context.gameStarted = false;
+      LED_Context.currentState = 'w';
       break;
   }
 }
@@ -165,10 +157,10 @@ void lightLED(int index) { // takes the index and turns the led of the index and
   }
 }
 //Reset for next Round
-void resetConfiguration() {
+void resetConfiguration(){
   LED_Context.speed = 50;
   LED_Context.clockwise = false;
-  LED_Context.index = random(15, 100);  // to ensure that the game always starts in the critical region
+  LED_Context.index = (rand() + 5) % (NUM_LEDS-5);
 }
 
 //Interrupt routine for Gesture Sensor
