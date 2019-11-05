@@ -1,274 +1,140 @@
 
-#include <FastLED.h>
-#include <Wire.h>
-#include <SparkFun_APDS9960.h>
+// include SoftwareSerial library for wireless communication using xbee pro
 #include <SoftwareSerial.h>
-SoftwareSerial mySerial(4, 3); // RX, TX
-// Pins Gesture Sensor Interrupt
-#define APDS9960_INT    2 // Selected to be  an interrupt pin for the gesture sensor
-#define NUM_LEDS 119 // the number of LEDS in our strip
-#define DATA_PIN 7 // LED Data PIN
+// declare pins 5 and 6 on arduino for transmission and reception respectively
+SoftwareSerial mySerial(5, 6); // RX, TX
 
 
-// Global Variables
-SparkFun_APDS9960 apds = SparkFun_APDS9960();
-int isr_flag = 0; //initial interrupt flag
+// *****************Global variables*******************
+//Y-axis value are sent to the microcontroller on pin A2
+const int ypin = A2;
+//Variable for storing previous avg for Jerk Calculations
+double prevAvg = 0;
+//Variable for storing previous and present T for signalling a jump to the java program
+unsigned long  int prevT, presentT;
+// for low-pass filter - init to zero
+double dataY[3];
 
-//Context- used by States to determine change
+int score; // to maintain score
+
+//Context for states to decide
 struct Context {
-  char currentState = 'w';
+  char currentState; // w -> wait State, g-> game-ON State, o-> game Over State
   byte message;
-  int index = (rand() + 11) % (NUM_LEDS - 5); //  selecting random position to start- ensure not in critical region
-
-  int speed = 50; //starting speed
-  int maxSpeed = 10; //maximize the speed by minimizing the  delay between transitions is 10 ms
-  int minSpeed = 60; // minimize the speed by setting  delay to max value ->60msec
-  int topFocusIndex = 58; //the index at top focal centre  of loop
-  bool clockwise = false;
 };
+Context Acc_Context;
 
-Context LED_Context;
-CRGB leds[NUM_LEDS]; // define array of 119 LEDS  for individual addressing in the loop
-
-// w = wait to start state
-// n = nonCriticalState
-// c = criticalState
-// o = gameOver
+//***********************Setup***********************
 void setup() {
-
-  //LED setup by inserting model, data pin and controls
-  LEDS.addLeds<WS2812, DATA_PIN, RGB>(leds, NUM_LEDS);
-  LEDS.setBrightness(140); // adjust the LED brightness to 140
-  FastLED.clear(); //clear any old data in the LEDs
-  preGameAnimation(); // animation before Game starts
-  // Gesture Sensor set-up
-  // Set interrupt pin as input
-  pinMode(APDS9960_INT, INPUT);
-
-  // Initialize Serial port to begin wireless communication
+  // initialize the serial communications:
   mySerial.begin(9600);
+  // initialize all values to the first reading on y pin
+  prevAvg = dataY[0] = dataY[1] = dataY[2] = convertToG(analogRead(ypin));
+  // initialize to current time
+  presentT = prevT = millis();
+  Acc_Context.currentState = 'w'; // initially the current state is wait to start
+  score = 0;
 
-  // Initialize interrupt service routine
-  attachInterrupt(0, interruptRoutine, FALLING);
-
-  // Initialize APDS-9960 (configure I2C and initial values)
-  if ( !apds.init() ) { //if failed to init
-    mySerial.write((byte)B00000000); // will be implemented in future
-  }
-
-  // Start running the APDS-9960 gesture sensor engine
-  if ( !apds.enableGestureSensor(true) ) { //if failed to enable
-    mySerial.write((byte)B00000000); // will be implemented in future
-  }
 }
 
-//////////////////////////LOOP/////////////////////////////////////////////////
+//***********************Loop***********************
 void loop() {
+
   if (mySerial.available()) { //check for the beginning and end of game
-    byte statusCode = (byte)mySerial.read(); // read the Data sent as byte - can read from other end node
-    LED_Context.message = statusCode;
+    Acc_Context.message = (byte)mySerial.read(); // read the Data sent as byte
   }
-
-  //ensure index is valid
-  LED_Context.index = ( LED_Context.index + NUM_LEDS) % NUM_LEDS; // to continue looping correctly
-
-  //if a gesture is detected, handle it
-  if ( isr_flag == 1 ) { // if interrupt flag has been raised  to 1 = a gesture is detected
-    detachInterrupt(0);
-    handleGesture(); // checks what gesture is detected and takes  appropriate action based on the  type of the gesture
-    isr_flag = 0; // after handling the gesture reset interrupt flag to 0 for the next gesture recognition
-    attachInterrupt(0, interruptRoutine, FALLING);
-  }
-
-
-  switch (LED_Context.currentState) {
-    case 'w': // if current state is Pre Animation
-      if (LED_Context.message == B11111111) {
-        LED_Context.currentState = 'n';
+  //State Design Pattern
+  switch (Acc_Context.currentState) {
+    case 'w':
+      if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
+      {
+        Acc_Context.currentState = 'g';
       }
       break;
 
-    case 'n': // if current state is Pre Animation
-      if (LED_Context.message == B00000000) { //if game ended signal received
-        LED_Context.currentState = 'o';
+    //Send final point one game over.
+    case 'g':
+      if (Acc_Context.message == 0b00000000) { //if Java sent 0- send final points
+        mySerial.write((byte) score); // send final score to Java
+        Acc_Context.currentState = 'o'; // change to wait state
       }
-      else if (( LED_Context.index == 115) || (LED_Context.index == 4)) {
-        //light up 3 leds at the index
-        lightLED(LED_Context.index);
-        /* XY00CDDD
-            X -Player Id =0 for player 1
-            Y = 1 for device is LED
-            C= 1 for led inside critical region
-            DDD = the getByte(int)function -> takes the speed, returns the appropriate data to send to the java
-        */
-        mySerial.write(getByteCode(LED_Context.speed));
-        LED_Context.currentState = 'c';
-      }
-      break;
+      else { // if no state change - do the processing
+        dataY[2] = convertToG(analogRead(ypin));
+        // [2]store the time when the value was read
+        presentT = millis();
 
-    case 'c':// if current state is Critical
-      if (LED_Context.message == B00000000) {  //if game ended signal received
-        LED_Context.currentState = 'o';
-      }
-      else  if (( LED_Context.index < 115) || (LED_Context.index > 4)) {
-        //light up 3 leds at the index
-        lightLED(LED_Context.index);
-        /* XY00CDDD
-            X -Player Id =0 for player 1
-            Y = 1 for device is LED
-            C= 1 for led inside critical region
-            DDD = 000 for LED outside the critical region
-        */
-        mySerial.write((byte)B01000000);
-        LED_Context.currentState = 'n';
-      }
-      break;
+        //[3] calculate moving average (low-pass filter) for smoothening the data
+        double avgYG = movingAverage(dataY[0], dataY[1], dataY[2]);
 
+        //[4]Calculate the Jerk
+        double jerk = convertToJerk(avgYG, prevAvg);
+
+        // [5]if a jump is detected (i.e jerk>=5) and no signal for jump has been transmitted in the last one second then send a signal
+        if (jerk >= 5 && (presentT > (prevT + 1000))) {
+
+          evaluateJump();
+
+          // update score and signal to java so that java can intensify the sound
+          //mySerial.write(B00001111); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 1111->successful jump
+
+          // store the present time for sending a byte for the next valid jump
+          prevT = presentT;
+        } // end jump detected
+
+        delay(10);// constant delay between the readings
+      }
     case 'o':
-
-      if (LED_Context.message == B00001111) {
-
-        resetConfiguration();
-
-        LED_Context.currentState = 'w';
-      }
-
-      else {
-        fill_solid( leds, NUM_LEDS, CRGB(224, 176, 230)); //Fill color after animation -> sets all LEDs to blue/white
+      if (Acc_Context.message == 0b00001111) {
+        resetScore();
+        Acc_Context.currentState = 'w'; // change to wait state
       }
       break;
-  }
-}
-//END LOOP
-
-//Light up 7 LEDS at index and reset for next iteration
-//CRGB( GREEN, RED , BLUE )
-void lightLED(int index) { // takes the index and turns the led of the index and 3 leds before and after the index to Deep Red
-  fill_solid( leds, NUM_LEDS, CRGB(10, 150, 10)); // pink background
-  for (int k = index - 3; k <= index + 3; k++) {
-    leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB(0, 0, 255); // Deep Blue
-  }
-
-  FastLED.show();// flushes the color on the led strip immediately
-  // clear this led for the next time around the loop
-  for (int k = index - 3; k <= index + 3; k++) {
-    leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB::Black;
-  }
-  //Delay controls the speed of the loop motion
-  delay(LED_Context.speed);
-  if (LED_Context.clockwise) {
-    --LED_Context.index;
-  } else {
-    ++LED_Context.index;
-  }
-}
-//Reset for next Round
-void resetConfiguration() {
-  LED_Context.speed = 50;
-  LED_Context.clockwise = false;
-  LED_Context.index = (rand() + 5) % (NUM_LEDS - 5);
+  }//end switch
 }
 
-//Interrupt routine for Gesture Sensor
-void interruptRoutine() {
-  isr_flag = 1;
+//******************Functions**********************
+
+//calculate the average of 3 values
+inline double movingAverage(double &data0, double &data1, const double &data2) {
+  double avg = (data0 + data1 + data2) / 3.0;
+  data0 = data1;
+  return data1 = avg; // storing the  current average
 }
 
-//Function to handle Gestures
-
-void handleGesture() {
-  if ( apds.isGestureAvailable() ) {
-    switch ( apds.readGesture() ) {
-      case DIR_UP: // if an up gesture is detected  then decide direction based on the position of the index in the strip
-        if ( LED_Context.index >  LED_Context.topFocusIndex) { // and index is above the topfocus, then  to move upwards  set motion direction to clockwise
-          LED_Context.clockwise = true;
-        } else {  // and if  index is below the topfocus, then  to move upwards  set motion direction to anti clockwise
-          LED_Context.clockwise = false;
-        }
-        break;
-
-      case DIR_DOWN:  // if an up gesture is detected  then decide direction based on the position of the index in the strip
-        if ( LED_Context.index >  LED_Context.topFocusIndex) {
-          LED_Context.clockwise = false; // and index is above the topfocus, then  to move downwards  set motion direction to anti-clockwise(i.e !clockwise)
-        } else {
-          LED_Context.clockwise = true;
-        }
-        break;
-
-      case DIR_LEFT: // left gesture means reduce speed
-        if ( LED_Context.speed <  LED_Context.minSpeed) {
-          LED_Context.speed += 10; //increase delay by 5ms
-        }
-        break;
-
-      case DIR_RIGHT: // right gesture means increase speed
-        if (LED_Context.speed > LED_Context.maxSpeed) {
-          LED_Context.speed -= 10; //decrease delay by 5ms
-        }
-        break;
-
-    }
-  }
+//convert value to G
+inline double convertToG(int value) {
+  return (0.01 * value) - 6.2;  //  return  G value;
 }
 
-//****************************Functions********************************
-
-//Get a byte to send to accelerometer to determine score
-//Please refer to communication Table in the report for more info
-byte getByteCode(int speed) {
-  if (speed == 10)
-    return (byte)B01001101;
-
-  else if (speed == 20)
-    return (byte)B01001100;
-
-  else if (speed == 30)
-    return (byte)B01001011;
-
-  else if (speed == 40)
-    return (byte)B01001010;
-
-  else if (speed == 50)
-    return (byte)B01001001;
-
-  else if (speed == 60)
-    return (byte)B01001000;
+//convert value to jerk
+double convertToJerk(double currentAvg, double &prevAvg) {
+  double jerk = abs(10 * (currentAvg - prevAvg)); //abs
+  // storing the current avg as prevAvg to calculate jerk for next current reading
+  prevAvg = currentAvg;
+  return jerk;
 }
 
-//Pre game animation
-void preGameAnimation() {
-
-  static uint8_t hue = 0; // color intensity
-  // First slide the led in one direction
-  for (int i = 0; i < NUM_LEDS; i++) {
-    // Set the i'th led to red
-    leds[i] = CHSV(hue++, 255, 255);
-    // Show the leds
-    FastLED.show();
-    // now that we've shown the leds, reset the i'th led to black
-    // leds[i] = CRGB::Black;
-    fadeall();
-    // Wait a little bit before we loop around and do it again
-    delay(10);
+//Evaluate jump
+void evaluateJump() {
+  if ((Acc_Context.message & B01000000) == 0) { // jumped in non critical region - WRONG
+    mySerial.write(B00000001); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0001->wrong jump
+    decreaseScore();
+  }
+  else if ((Acc_Context.message & B01000000) != 0) // ensure the message is meant for current player by its device (XY check)
+  {
+    mySerial.write(B00000010); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0010-> correct jump
+    increaseScore(Acc_Context.message );
   }
 
-  // Now go in the other direction.
-  for (int i = (NUM_LEDS) - 1; i >= 0; i--) {
-    // Set the i'th led to red
-    leds[i] = CHSV(hue++, 255, 255);
-    // Show the leds
-    FastLED.show();
-    // now that we've shown the leds, reset the i'th led to black
-    // leds[i] = CRGB::Black;
-    fadeall();
-    // Wait a little bit before we loop around and do it again
-    delay(10);
-  }
-  fill_solid( leds, NUM_LEDS, CRGB(224, 176, 230)); //Fill color after animation -> sets all LEDs to blue/white
-  FastLED.show();
 }
-void fadeall() {
-  for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i].nscale8(250);
-  }
+void increaseScore(byte message) { // Increase score depending on speed (multiplier)
+  unsigned int multiplier = (message & 0b00001111);
+  score += 2 * multiplier;
+}
+void decreaseScore() {
+  score -= 1; // decrease 1 point for missing jump
+}
+
+void resetScore() {
+  score = 0;
 }
