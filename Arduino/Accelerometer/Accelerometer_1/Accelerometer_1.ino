@@ -15,13 +15,11 @@ unsigned long  int prevT, presentT;
 // for low-pass filter - init to zero
 double dataY[3];
 
-int score; // to maintain score 
-
-LED_State LED;
+int score; // to maintain score
 
 //Context for states to decide
 struct Context {
-  char currentState;
+  char currentState; // w -> wait State, g-> game-ON State, o-> game Over State
   byte message;
 };
 Context Acc_Context;
@@ -58,10 +56,9 @@ void loop() {
     case 'g':
       if (Acc_Context.message == 0b00000000) { //if Java sent 0- send final points
         mySerial.write((byte) score); // send final score to Java
-        score =0;
-        Acc_Context.currentState = 'w'; // change to wait state
+        Acc_Context.currentState = 'o'; // change to wait state
       }
-      else {
+      else { // if no state change - do the processing
         dataY[2] = convertToG(analogRead(ypin));
         // [2]store the time when the value was read
         presentT = millis();
@@ -84,8 +81,14 @@ void loop() {
           prevT = presentT;
         } // end jump detected
 
-        delay(100);// constant delay between the readings
+        delay(10);// constant delay between the readings
       }
+    case 'o':
+      if (Acc_Context.message == 0b00001111) {
+        resetScore();
+        Acc_Context.currentState = 'w'; // change to wait state
+      }
+      break;
   }//end switch
 }
 
@@ -130,5 +133,8 @@ void increaseScore(byte message) { // Increase score depending on speed (multipl
 }
 void decreaseScore() {
   score -= 1; // decrease 1 point for missing jump
+}
 
+void resetScore() {
+  score = 0;
 }
