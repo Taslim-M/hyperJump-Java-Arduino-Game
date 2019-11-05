@@ -23,8 +23,8 @@ struct Context {
   int speed = 50; //starting speed
   const int maxSpeed = 10; //maximize the speed by minimizing the  delay between transitions is 10 ms
   const int minSpeed = 60; // minimize the speed by setting  delay to max value ->60msec
-  int topFocusIndex = 58; //the index at top focal centre  of loop
-  bool clockwise = false;
+  const int topFocusIndex = 58; //the index at top focal centre  of loop
+  bool clockwise = false; //initial direction anticlockwise
 };
 
 Context LED_Context;
@@ -65,8 +65,7 @@ void setup() {
 //////////////////////////LOOP/////////////////////////////////////////////////
 void loop() {
   if (mySerial.available()) { //check for the beginning and end of game
-    byte statusCode = (byte)mySerial.read(); // read the Data sent as byte - can read from other end node
-    LED_Context.message = statusCode;
+    LED_Context.message = (byte)mySerial.read(); // read the Data sent as byte -update Context.msg
   }
 
   //ensure index is valid
@@ -83,13 +82,14 @@ void loop() {
 
   switch (LED_Context.currentState) {
     case 'w': // if current state is Pre Animation
-      if (LED_Context.message == B11111111) { // if game started signal received
+      if (LED_Context.message == 0b11111111) { // if game started signal received
         LED_Context.currentState = 'n';      //  change current-state to non-critical region
       }
       break;
 
     case 'n': // if current state is Pre Animation
-      if (LED_Context.message == B00000000) { //if game ended signal received
+      if (LED_Context.message == 0b00000000) { //if game ended signal received
+        fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
         LED_Context.currentState = 'o';  // change state to game over
       }
       else if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
@@ -102,13 +102,13 @@ void loop() {
         mySerial.write(getByteCode(LED_Context.speed)); // broadcast message= entering critical region with a speed
         LED_Context.currentState = 'c'; // change current-state to critical region
       }
-
       //light up 3 leds at the index
       lightLED(LED_Context.index);
       break;
 
     case 'c':// if current state is Critical
       if (LED_Context.message == B00000000) {  //if game ended signal received
+        fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
         LED_Context.currentState = 'o';  // change current-state to game over state
       }
       else  if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
@@ -129,15 +129,11 @@ void loop() {
     case 'o':
 
       if (LED_Context.message == B00001111) { // B00001111-> another round needs to be played
-
         resetConfiguration(); // reset configuration
-
+        preGameAnimation();
         LED_Context.currentState = 'w'; // change current state to wait to start state
       }
 
-      else {
-        fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
-      }
       break;
   }
 }
