@@ -15,17 +15,18 @@ unsigned long  int prevT, presentT;
 // for low-pass filter - init to zero
 double dataY[3];
 
-int score; // to maintain score
+byte score; // to maintain score
 
 //Context for states to decide
 struct Context {
   char currentState; // w -> wait State, g-> game-ON State, o-> game Over State
-  byte message;
+  byte message = 0b00000000;
 };
 Context Acc_Context;
 
 //***********************Setup***********************
 void setup() {
+  Serial.begin(9600);
   // initialize the serial communications:
   mySerial.begin(9600);
   // initialize all values to the first reading on y pin
@@ -48,6 +49,7 @@ void loop() {
     case 'w':
       if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
       {
+        Serial.println("Entering game");
         Acc_Context.currentState = 'g';
       }
       break;
@@ -55,7 +57,9 @@ void loop() {
     //Send final point one game over.
     case 'g':
       if (Acc_Context.message == 0b00000000) { //if Java sent 0- send final points
-        mySerial.write((byte) score); // send final score to Java
+        delay(100); // wait 10ms to let Java finish broadcast
+        mySerial.write(score); // send final score to Java
+        Serial.println(score);
         Acc_Context.currentState = 'o'; // change to wait state
       }
       else { // if no state change - do the processing
@@ -116,23 +120,28 @@ double convertToJerk(double currentAvg, double &prevAvg) {
 
 //Evaluate jump
 void evaluateJump() {
-  if ((Acc_Context.message & B01000000) == 0) { // jumped in non critical region - WRONG
-    mySerial.write(B00000001); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0001->wrong jump
-    decreaseScore();
-  }
-  else if ((Acc_Context.message & B01000000) != 0) // ensure the message is meant for current player by its device (XY check)
-  {
+  if (((Acc_Context.message & B01000000) != 0) and ((Acc_Context.message & B00001111) != 0) ) { //ensure msg is from current user device
     mySerial.write(B00000010); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0010-> correct jump
     increaseScore(Acc_Context.message );
+  }
+  else  {// jumped in non critical region - WRONG
+    mySerial.write(B00000001); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0001->wrong jump
+    decreaseScore();
   }
 
 }
 void increaseScore(byte message) { // Increase score depending on speed (multiplier)
-  unsigned int multiplier = (message & 0b00001111);
-  score += 2 * multiplier;
+  byte multiplier = ((message & 0b00001111) - 0b00000111);
+  if (score + multiplier < 64) {
+    score +=  multiplier;
+  }
+  Serial.println(score);
 }
 void decreaseScore() {
-  score -= 1; // decrease 1 point for missing jump
+  if (score != 0) {
+    score -= 1; // decrease 1 point for missing jump
+  }
+  Serial.println(score);
 }
 
 void resetScore() {

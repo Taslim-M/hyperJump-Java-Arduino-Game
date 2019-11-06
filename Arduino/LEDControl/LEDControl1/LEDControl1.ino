@@ -90,6 +90,7 @@ void loop() {
     case 'n': // if current state is Pre Animation
       if (LED_Context.message == 0b00000000) { //if game ended signal received
         fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
+        FastLED.show();
         LED_Context.currentState = 'o';  // change state to game over
       }
       else if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
@@ -109,6 +110,7 @@ void loop() {
     case 'c':// if current state is Critical
       if (LED_Context.message == B00000000) {  //if game ended signal received
         fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
+        FastLED.show();
         LED_Context.currentState = 'o';  // change current-state to game over state
       }
       else  if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
@@ -128,7 +130,7 @@ void loop() {
 
     case 'o':
 
-      if (LED_Context.message == B00001111) { // B00001111-> another round needs to be played
+      if (LED_Context.message == 0b00001111) { // B00001111-> another round needs to be played
         resetConfiguration(); // reset configuration
         preGameAnimation();
         LED_Context.currentState = 'w'; // change current state to wait to start state
