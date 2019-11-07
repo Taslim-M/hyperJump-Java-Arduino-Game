@@ -1,11 +1,17 @@
 package hyperJump;
-public class GameCoordinator {
+
+import java.util.ArrayList;
+
+public class GameCoordinator implements Observer{
 	SerialPortHandle sph; // to read/write bytes
 	private int gameRunTime; // control total time of game in ms
-	
+	GameContext context;
+	ArrayList<Subject> proxies;
 	public GameCoordinator(SerialPortHandle sph, int gameRunTime) {
 		this.sph = sph;
 		this.gameRunTime = gameRunTime;
+		this.context = new GameContext();
+		proxies = new ArrayList<Subject>();
 	}
 	
 	//This function starts the game for the specified time
@@ -14,9 +20,8 @@ public class GameCoordinator {
 		for (int i = 0; i < 5; ++i) { //repeat 5 times to ensure end-nodes have read
 			sph.writeByte((byte) 0b11111111); //transmit thru serial port
 		}
-		State player1State = new State(0); //create state for player 1
+		UnusuedState player1State = new UnusuedState(0); //create state for player 1
 		long startTime = System.currentTimeMillis(); // store the starting time of the game
-
 		while (System.currentTimeMillis() <= startTime + gameRunTime) { // game continues for one minute
 			byte b = sph.readByte(); //read a byte from serial port
 			ByteDecoder.DecodeMessage(b, player1State);// analyze the byte and update player1State
@@ -34,5 +39,15 @@ public class GameCoordinator {
 		for (int i = 0; i < 5; ++i) { //repeat it 5 times to ensure all nodes have read
 			sph.writeByte((byte) 0); // to end the game;
 		}
+	}
+
+	@Override
+	public void update(Object o) {
+		
+	}
+
+	@Override
+	public void call_back(msg m) {
+		
 	}
 }

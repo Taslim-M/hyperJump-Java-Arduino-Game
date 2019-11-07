@@ -1,7 +1,6 @@
 package hyperJump;
 
 public interface GameStates {
-	public void registerMe();
-	public void timeUp();
-	public void anotherRound();
+	public void next();
+	public void prev();
 }

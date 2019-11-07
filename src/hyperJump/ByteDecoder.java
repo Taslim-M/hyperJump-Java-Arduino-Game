@@ -48,7 +48,7 @@ public final class ByteDecoder {
 		ledStripEnter = AccelerometerJump = false;
 	}
 
-	public static void DecodeMessage(byte b, State s1) {// Currently we have only player
+	public static void DecodeMessage(byte b, UnusuedState s1) {// Currently we have only player
 		// Sets the player number to 0 or 1
 		CheckPlayerNumber(b);
 
