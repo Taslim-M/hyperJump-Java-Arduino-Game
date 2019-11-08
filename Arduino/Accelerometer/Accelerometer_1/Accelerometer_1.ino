@@ -3,10 +3,10 @@
 #include <SoftwareSerial.h>
 // declare pins 5 and 6 on arduino for transmission and reception respectively
 SoftwareSerial mySerial(5, 6); // RX, TX
-
-
 // *****************Global variables*******************
 //Y-axis value are sent to the microcontroller on pin A2
+const int timer = 60000;
+int gameStartingTime;
 const int ypin = A2;
 //Variable for storing previous avg for Jerk Calculations
 double prevAvg = 0;
@@ -36,6 +36,7 @@ void setup() {
   Acc_Context.currentState = 'w'; // initially the current state is wait to start
   score = 0;
 
+
 }
 
 //***********************Loop***********************
@@ -49,15 +50,18 @@ void loop() {
     case 'w':
       if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
       {
+
         Serial.println("Entering game");
         Acc_Context.currentState = 'g';
+        gameStartingTime = millis();
       }
       break;
 
     //Send final point one game over.
     case 'g':
-      if (Acc_Context.message == 0b00000000) { //if Java sent 0- send final points
-        delay(100); // wait 10ms to let Java finish broadcast
+      if (gameStartingTime + timer <= millis()) { // if millisis i.e Current Time larger than or equal to the time the game started + 60000 msec
+        mySerial.write(Acc_Context.message == 0b00000000); // broad cast tgame over to all the devices
+        delay(100); // wait 10ms to let Java finish broadcast because java will take the message and broad cast it 10 times
         mySerial.write(score); // send final score to Java
         Serial.println(score);
         Acc_Context.currentState = 'o'; // change to wait state
@@ -97,6 +101,7 @@ void loop() {
 }
 
 //******************Functions**********************
+
 
 //calculate the average of 3 values
 inline double movingAverage(double &data0, double &data1, const double &data2) {
