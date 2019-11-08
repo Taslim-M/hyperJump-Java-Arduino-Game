@@ -35,13 +35,6 @@ public class Proxy implements Runnable, Observer, Subject {
 		d.send_msg(this, m);
 	}
 
-	msg get_msg() {
-
-		// does this really make sense?
-		// do you need this message?
-
-		return d.get_msg(this);
-	}
 
 	public void run() {
 		msg b;

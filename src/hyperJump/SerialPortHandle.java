@@ -2,6 +2,7 @@ package hyperJump;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
+import jssc.SerialPortTimeoutException;
 public class SerialPortHandle {
 
 	SerialPort sp;
@@ -20,17 +21,32 @@ public class SerialPortHandle {
 		} // Open serial port
 
 	}
+	public boolean isAvailable()   {
+		try {
+			return (sp.getInputBufferBytesCount() > 0);
+		} catch (SerialPortException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 	//Read one byte from the serial port
-	public byte readByte() { 
+	public Byte readByte() { 
 
 		byte[] buffer = null;
+		boolean hasRead = false;
 		try {
-			buffer = sp.readBytes(1); // read one byte, return type is byte[]
+			if(sp.getInputBufferBytesCount() > 0) { //read if available to avoid errors
+				buffer = sp.readBytes(1);
+				hasRead=true;
+			}
 
 		} catch (SerialPortException e1) {
 			e1.printStackTrace();
 		}
-		return buffer[0]; // send the first element in the array
+		if(hasRead)	
+			return buffer[0]; // send the first element in the array
+		else 
+			return null;
 
 	}	
 	//Send a byte to end-nodes

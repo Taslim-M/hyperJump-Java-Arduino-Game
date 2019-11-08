@@ -14,4 +14,10 @@ public class RoundOnState implements GameStates{
 		
 	}
 
+	@Override
+	public void printStatus() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

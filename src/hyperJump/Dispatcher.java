@@ -8,23 +8,19 @@ import java.util.Random;
 public class Dispatcher implements Runnable, Subject {
 
 	// need to keep track of proxies
-
 	ArrayList<Proxy> proxies;
-	Random r = new Random();
+	// HashMap improves search speed
 	HashMap<Byte, Proxy> hashMap = new HashMap<Byte, Proxy>();
 
-	FileInputStream fin = null;
-	DataInputStream byteReader = null;
-	Byte currentMsg;
+	msg currentMsg;
 	SerialPortHandle sph;
+
 	Dispatcher(SerialPortHandle sph) throws FileNotFoundException {
 
 		// create an array list to remember proxies
 		proxies = new ArrayList<Proxy>();
-
-		// To read one byte from file and process
-		fin = new FileInputStream("bytes");
-		byteReader = new DataInputStream(new BufferedInputStream(fin));
+		// initiate the byte to null
+		currentMsg = null;
 		this.sph = sph;
 		// start the thread
 		new Thread(this).start();
@@ -36,19 +32,9 @@ public class Dispatcher implements Runnable, Subject {
 		// resource
 		Debug.trace("Dispatcher: Message m=" + m.value + " received from " + proxy);
 
-		// decode the message and send to the right person.
-		// should look like a switch statement
-		/*
-		 * switch(msg.get_id()) { case 0: // send msg.get_payload() to hardware edge
-		 * node 0 break; case 1: // send send msg.get_payload() to hardware edge node 1
-		 * break; default: // code block }
-		 */
-	}
-
-	public msg get_msg(Proxy proxy) {
-		return null;
-		// receive a message
-		// do you really need this?
+		// Set Correct ID of the proxy to be sure end to the right person.
+		m.setID(proxy.hardwareID);
+		sph.writeByte(m.value);
 
 	}
 
@@ -65,54 +51,28 @@ public class Dispatcher implements Runnable, Subject {
 		// look for messages from the hardware
 		// when message arrives figure out who is the message
 		// intended for and send them the message
-
 		// we will use a call_back to send the message back.
-		// hard-coded to the first element of the proxies list
-		// change this to decode the message to figure out
-		// who should get the message.
 
 		while (true) {
-
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			//read from hardware
+			if (sph.isAvailable()) {
+				this.currentMsg.value = sph.readByte();
 			}
-			try {
-				if (byteReader.available() > 0) {
-					this.currentMsg = byteReader.readByte();
-				} else {
-					break; // IF all bytes from file are read
-				}
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			// should read and decode the message and figure out
-			// the index of the proxy the message is intended for
-			// the index has been hard-coded to 0 here.
-
-			if (proxies.size() > 0) {
-				Proxy correctProxy = hashMap.get(getID(this.currentMsg));
-				if (correctProxy != null) {
-					correctProxy.call_back(new msg(getPayLoad(this.currentMsg)));
-				} else {
-					System.out.println("The ID " + getID(this.currentMsg) + " does not belong to any proxy");
-				}
+			//if read - send to correct proxy
+			if (currentMsg != null) {
+				notifyObservers();
 			}
 		}
-
 	}
 
 	@Override
 	public void registerObserver(Observer o) {
-		Proxy proxy = (Proxy)o;
+		Proxy proxy = (Proxy) o;
 		// add a new proxy to your list of known proxies
 		hashMap.put(proxy.hardwareID, proxy);
 		proxies.add(proxy);
 		try {
 			Debug.trace("Adding " + proxy + " to list of proxies known to " + this);
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -125,12 +85,22 @@ public class Dispatcher implements Runnable, Subject {
 		if (i >= 0) {
 			hashMap.remove(proxies.get(i).hardwareID);
 			proxies.remove(i);
-		
 		}
 	}
+
 	@Override
 	public void notifyObservers() {
-		
+		// should read and decode the message and figure out
+		// the index of the proxy the message is intended for
+		if (proxies.size() > 0) {
+			Proxy correctProxy = hashMap.get(currentMsg.getID());
+			if (correctProxy != null) {
+				correctProxy.call_back(new msg(this.currentMsg.getPayLoad()));
+			} else {
+				System.out.println("The ID " + (this.currentMsg.getID()) + " does not belong to any proxy");
+			}
+			currentMsg = null;
+		}
 	}
 
 }

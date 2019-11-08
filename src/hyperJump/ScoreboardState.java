@@ -12,6 +12,12 @@ public class ScoreboardState implements GameStates {
 		
 	}
 
+	@Override
+	public void printStatus() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 
 }

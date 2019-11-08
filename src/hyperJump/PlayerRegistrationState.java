@@ -14,4 +14,10 @@ public class PlayerRegistrationState implements GameStates{
 		
 	}
 
+	@Override
+	public void printStatus() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
