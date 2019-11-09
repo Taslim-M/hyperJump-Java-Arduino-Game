@@ -1,53 +1,68 @@
 package hyperJump;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
-public class GameCoordinator implements Observer{
-	SerialPortHandle sph; // to read/write bytes
-	private int gameRunTime; // control total time of game in ms
+public class GameCoordinator implements Observer, Runnable {
 	GameContext context;
 	ArrayList<Subject> proxies;
-	public GameCoordinator(SerialPortHandle sph, int gameRunTime) {
-		this.sph = sph;
-		this.gameRunTime = gameRunTime;
+
+	public GameCoordinator(ArrayList<Subject> subjects) {
 		this.context = new GameContext();
 		proxies = new ArrayList<Subject>();
+		// register with all the proxy subjects
+		for (Subject subject : subjects) {
+			subject.registerObserver(this);
+		}
 	}
-	
-	//This function starts the game for the specified time
+
+	// This function starts the game for the specified time
 	public void beginGame() {
 		// broadcast to start game -- end nodes await for 11111111
-		for (int i = 0; i < 5; ++i) { //repeat 5 times to ensure end-nodes have read
-			sph.writeByte((byte) 0b11111111); //transmit thru serial port
+		for (int i = 0; i < 5; ++i) { // repeat 5 times to ensure end-nodes have read
+			sph.writeByte((byte) 0b11111111); // transmit thru serial port
 		}
-		UnusuedState player1State = new UnusuedState(0); //create state for player 1
+		UnusuedState player1State = new UnusuedState(0); // create state for player 1
 		long startTime = System.currentTimeMillis(); // store the starting time of the game
 		while (System.currentTimeMillis() <= startTime + gameRunTime) { // game continues for one minute
-			byte b = sph.readByte(); //read a byte from serial port
+			byte b = sph.readByte(); // read a byte from serial port
 			ByteDecoder.DecodeMessage(b, player1State);// analyze the byte and update player1State
-			
-			//if the critical region has just been entered (less than 0.5 ms since it was read), print to console
-			if (player1State.hasJumped && player1State.shouldJump) { //if a jump is detected correctly
+
+			// if the critical region has just been entered (less than 0.5 ms since it was
+			// read), print to console
+			if (player1State.hasJumped && player1State.shouldJump) { // if a jump is detected correctly
 				System.out.println("Great Jump Score added: " + player1State.scoreMultiplier);
-			}else if(player1State.hasJumped && !player1State.shouldJump) {
+			} else if (player1State.hasJumped && !player1State.shouldJump) {
 				System.out.println("Wrong Jump");
 			}
 		}
 	}
+
 //Broadcast 0000 0000 to the end-nodes, signaling them to stop
 	public void endGame() {
-		for (int i = 0; i < 5; ++i) { //repeat it 5 times to ensure all nodes have read
+		for (int i = 0; i < 5; ++i) { // repeat it 5 times to ensure all nodes have read
 			sph.writeByte((byte) 0); // to end the game;
 		}
 	}
 
 	@Override
 	public void update(Object o) {
-		
+
 	}
 
 	@Override
 	public void call_back(msg m) {
-		
+
+	}
+
+	public void notifySuccessfulRegistration() {
+		requestProxies(new msg((byte) 0b11111111));
+	}
+
+	// Request proxies to send this msg to dispatcher
+	public void requestProxies(msg m) {
+		for (Subject proxy : proxies) {
+			((Proxy) proxy).send_msg(m);
+		}
 	}
 }

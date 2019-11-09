@@ -3,7 +3,6 @@ package hyperJump;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 public class Dispatcher implements Runnable, Subject {
 
@@ -26,24 +25,22 @@ public class Dispatcher implements Runnable, Subject {
 		new Thread(this).start();
 	}
 
-	public void send_msg(Proxy proxy, msg m) throws IOException {
+	// Broadcast message
+	public void send_msg(Proxy proxy, msg m) {
+		// immediate processes the message when invoked - can be shared by multiple
+		// proxies.. hence we need to synchronize this for exclusive usage
+		synchronized (this) {
+			// this message should be sent out to the appropriate hardware resource
+			try {
+				Debug.trace("Dispatcher: Message m=" + m.value + " received from " + proxy);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-		// this message should be sent out to the appropriate hardware
-		// resource
-		Debug.trace("Dispatcher: Message m=" + m.value + " received from " + proxy);
-
-		// Set Correct ID of the proxy to be sure end to the right person.
-		m.setID(proxy.hardwareID);
-		sph.writeByte(m.value);
-
-	}
-
-	public byte getID(byte b) {
-		return (byte) (b >> 6); // assuming first 2 bits are ID
-	}
-
-	public byte getPayLoad(byte b) {
-		return (byte) (b & 0b00111111); // assuming first 2 bits are ID
+			// Set Correct ID of the proxy to be sure end to the right person.
+			m.setID(proxy.hardwareID);
+			sph.writeByte(m.value);
+		}
 	}
 
 	@Override
@@ -54,11 +51,11 @@ public class Dispatcher implements Runnable, Subject {
 		// we will use a call_back to send the message back.
 
 		while (true) {
-			//read from hardware
+			// read from hardware
 			if (sph.isAvailable()) {
 				this.currentMsg.value = sph.readByte();
 			}
-			//if read - send to correct proxy
+			// if read - send to correct proxy
 			if (currentMsg != null) {
 				notifyObservers();
 			}
@@ -68,7 +65,7 @@ public class Dispatcher implements Runnable, Subject {
 	@Override
 	public void registerObserver(Observer o) {
 		Proxy proxy = (Proxy) o;
-		// add a new proxy to your list of known proxies
+		// add a new proxy to your list of known proxies and hashmap
 		hashMap.put(proxy.hardwareID, proxy);
 		proxies.add(proxy);
 		try {
@@ -81,6 +78,7 @@ public class Dispatcher implements Runnable, Subject {
 
 	@Override
 	public void removeObserver(Observer o) {
+		// remove from the list and the hashmap
 		int i = proxies.indexOf((Proxy) o);
 		if (i >= 0) {
 			hashMap.remove(proxies.get(i).hardwareID);
@@ -88,6 +86,8 @@ public class Dispatcher implements Runnable, Subject {
 		}
 	}
 
+	// This method is invoked only when a msg is received from serial port
+	// Sends to the correct proxy
 	@Override
 	public void notifyObservers() {
 		// should read and decode the message and figure out
@@ -95,7 +95,7 @@ public class Dispatcher implements Runnable, Subject {
 		if (proxies.size() > 0) {
 			Proxy correctProxy = hashMap.get(currentMsg.getID());
 			if (correctProxy != null) {
-				correctProxy.call_back(new msg(this.currentMsg.getPayLoad()));
+				correctProxy.call_back(new msg(this.currentMsg.value));
 			} else {
 				System.out.println("The ID " + (this.currentMsg.getID()) + " does not belong to any proxy");
 			}
