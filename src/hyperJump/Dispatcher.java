@@ -43,6 +43,12 @@ public class Dispatcher implements Runnable, Subject {
 		}
 	}
 
+	// only for direct Broadcast message - private to Dispatcher
+	private void send_msg(msg m) {
+		// this message should be sent out to the appropriate hardware resource
+		sph.writeByte(m.value);
+	}
+
 	@Override
 	public void run() {
 		// look for messages from the hardware
@@ -57,7 +63,11 @@ public class Dispatcher implements Runnable, Subject {
 			}
 			// if read - send to correct proxy
 			if (currentMsg != null) {
-				notifyObservers();
+				if (currentMsg.isBroadcastMessage()) {
+					send_msg(currentMsg);
+				} else {
+					notifyObservers();
+				}
 			}
 		}
 	}
