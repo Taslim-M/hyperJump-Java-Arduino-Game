@@ -1,15 +1,15 @@
 package hyperJump;
 
 public class GameContext {
-	public msg currentMsg= null;
+	public msg currentMsg;
 	public GameState currentState;
-	
-	
-	public GameContext(){
+	private GameCoordinator gameCoordinator;
+	public GameContext(GameCoordinator gameCoordinator){
+		currentMsg = null;
+		this.gameCoordinator = gameCoordinator;
 		currentState = new PlayerRegistrationState();
 	}
 	
-
 	public void setState(GameState state) {
 		this.currentState = state;
 	}
