@@ -24,7 +24,6 @@ public class GameCoordinator implements Observer, Runnable {
 		}
 		UnusuedState player1State = new UnusuedState(0); // create state for player 1
 		long startTime = System.currentTimeMillis(); // store the starting time of the game
-		while (System.currentTimeMillis() <= startTime + gameRunTime) { // game continues for one minute
 			byte b = sph.readByte(); // read a byte from serial port
 			ByteDecoder.DecodeMessage(b, player1State);// analyze the byte and update player1State
 
