@@ -4,9 +4,10 @@ import java.io.*;
 import java.util.Scanner;
 
 public class ScoreboardState implements GameState {
-	boolean anotherRound; // false by Default
+	boolean anotherRound; 
 
 	public ScoreboardState() {
+		anotherRound=false;// false by Default
 	}
 
 	public void printStatus() {
