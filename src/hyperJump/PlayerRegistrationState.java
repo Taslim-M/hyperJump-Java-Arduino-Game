@@ -1,15 +1,15 @@
 package hyperJump;
 
-public class PlayerRegistrationState implements GameStates{
+public class PlayerRegistrationState implements GameState{
 
 	@Override
-	public void next() {
+	public void next(GameContext context) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void prev() {
+	public void prev(GameContext context) {
 		// TODO Auto-generated method stub
 		
 	}
