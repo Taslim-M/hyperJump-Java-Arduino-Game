@@ -26,7 +26,6 @@ Context Acc_Context;
 
 //***********************Setup***********************
 void setup() {
-  Serial.begin(9600);
   // initialize the serial communications:
   mySerial.begin(9600);
   // initialize all values to the first reading on y pin
@@ -35,13 +34,10 @@ void setup() {
   presentT = prevT = millis();
   Acc_Context.currentState = 'w'; // initially the current state is wait to start
   score = 0;
-
-
 }
 
 //***********************Loop***********************
 void loop() {
-
   if (mySerial.available()) { //check for the beginning and end of game
     Acc_Context.message = (byte)mySerial.read(); // read the Data sent as byte
   }
@@ -50,8 +46,6 @@ void loop() {
     case 'w':
       if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
       {
-
-        Serial.println("Entering game");
         Acc_Context.currentState = 'g';
         gameStartingTime = millis();
       }
@@ -60,10 +54,9 @@ void loop() {
     //Send final point one game over.
     case 'g':
       if (gameStartingTime + timer <= millis()) { // if millisis i.e Current Time larger than or equal to the time the game started + 60000 msec
-        mySerial.write(Acc_Context.message == 0b00000000); // broad cast tgame over to all the devices
+        mySerial.write(0b00000000); // broad cast tgame over to all the devices via dispatcher
         delay(100); // wait 10ms to let Java finish broadcast because java will take the message and broad cast it 10 times
         mySerial.write(score); // send final score to Java
-        Serial.println(score);
         Acc_Context.currentState = 'o'; // change to wait state
       }
       else { // if no state change - do the processing
@@ -133,20 +126,17 @@ void evaluateJump() {
     mySerial.write(B00000001); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0001->wrong jump
     decreaseScore();
   }
-
 }
 void increaseScore(byte message) { // Increase score depending on speed (multiplier)
   byte multiplier = ((message & 0b00001111) - 0b00000111);
-  if (score + multiplier < 64) {
+  if (score + multiplier < 64) { //do not cross max score of 63
     score +=  multiplier;
   }
-  Serial.println(score);
 }
 void decreaseScore() {
   if (score != 0) {
     score -= 1; // decrease 1 point for missing jump
   }
-  Serial.println(score);
 }
 
 void resetScore() {
