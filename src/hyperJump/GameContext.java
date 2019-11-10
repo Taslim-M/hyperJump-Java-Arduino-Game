@@ -3,7 +3,8 @@ package hyperJump;
 public class GameContext {
 	public msg currentMsg= null;
 	public GameState currentState;
-	public ByteDecoder;
+	
+	
 	public GameContext(){
 		currentState = new PlayerRegistrationState();
 	}
@@ -14,6 +15,7 @@ public class GameContext {
 	}
 	public void updateContext(msg m) {
 		this.currentMsg = m;
+		
 		currentState.next(this);
 	}
 }
