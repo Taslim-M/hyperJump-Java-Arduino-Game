@@ -33,11 +33,11 @@ public class GameCoordinator implements Observer, Runnable {
 
 	@Override
 	public void update(Object o) {
-		call_back((msg) o);
+		
 	}
 
 	@Override
-	public void call_back(msg m) {
+	public synchronized void call_back(msg m) {
 		fromProxies.add(m); // store the message from proxy into a queue
 	}
 
