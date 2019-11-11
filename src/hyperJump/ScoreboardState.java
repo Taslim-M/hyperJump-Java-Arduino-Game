@@ -4,14 +4,10 @@ import java.io.*;
 import java.util.Scanner;
 
 public class ScoreboardState implements GameState {
-	boolean anotherRound; 
+	boolean playAnotherRound; 
 
 	public ScoreboardState() {
-		anotherRound=false;// false by Default
-	}
-
-	public void printStatus() {
-		System.out.println("Scoreboard Displaying");
+		playAnotherRound=false;// false by Default
 	}
 
 	@Override
@@ -35,5 +31,7 @@ public class ScoreboardState implements GameState {
 	@Override
 	public void prev(GameContext context) {
 	}
-
+	public void printStatus() {
+		System.out.println("Scoreboard Displaying");
+	}
 }

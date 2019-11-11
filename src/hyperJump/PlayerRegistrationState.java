@@ -4,20 +4,20 @@ public class PlayerRegistrationState implements GameState{
 
 	@Override
 	public void next(GameContext context) {
-		// TODO Auto-generated method stub
-		
+		if(context.currentPlayerName!=null) {
+			//notify all devices to start
+			context.notifyRegistrationSuccess();
+			context.setState(new RoundOnState());
+		}
 	}
 
 	@Override
 	public void prev(GameContext context) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void printStatus() {
-		// TODO Auto-generated method stub
-		
+		System.out.println("Waiting for Player to Register themselves");
 	}
 
 }

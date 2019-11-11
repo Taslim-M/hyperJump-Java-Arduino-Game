@@ -6,17 +6,11 @@ public class RoundOnState implements GameState {
 	}
 
 	@Override
-	public void printStatus() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void next(GameContext context) {
-		// TODO Auto-generated method stub
 		ByteDecoder.updateFlags(context.currentMsg);
 		if (ByteDecoder.gameTimeOver) {
 			// broadcast game time over and set current state to ScoreBoard
+			context.notifyEndGame();
 			context.setState(new ScoreboardState());
 		} else if (ByteDecoder.validJumpDetected) {
 			// feeback sound
@@ -29,7 +23,10 @@ public class RoundOnState implements GameState {
 
 	@Override
 	public void prev(GameContext context) {
-
 	}
 
+	@Override
+	public void printStatus() {
+		System.out.println("Game is On");
+	}
 }

@@ -11,8 +11,7 @@ public final class ByteDecoder {
 		byte b = m.getPayLoad();
 		if (b == (byte) 0b00000000) {
 			gameTimeOver = true;
-		}
-		else if (b == (byte) 0b00000001) {
+		} else if (b == (byte) 0b00000001) {
 			invalidJumpDetected = true;
 		} else if (b == (byte) 0b000000010) {
 			validJumpDetected = true;
