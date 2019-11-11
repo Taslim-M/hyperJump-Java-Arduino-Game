@@ -18,7 +18,7 @@ public class Proxy implements Runnable, Observer, Subject {
 		// register yourself as a proxy with the dispatcher
 		d.registerObserver(this);
 		// Initiate the fields
-		
+
 		observers = new ArrayList<Observer>();
 		// start your thread
 		new Thread(this).start();
@@ -30,18 +30,18 @@ public class Proxy implements Runnable, Observer, Subject {
 	}
 
 	public void run() {
-		
+
 		// not used right now -> may be used in fututre use
 	}
 
 	@Override
 	public void update(Object o) {
-		
+
 	}
 
 	@Override
 	public void call_back(msg m) {
-		msgToForward=m;
+		msgToForward = m;
 		// call the game thread
 		notifyObservers(); // directly call_back the game thread
 		try {
@@ -67,9 +67,9 @@ public class Proxy implements Runnable, Observer, Subject {
 
 	@Override
 	public void notifyObservers() {
-		
+
 		for (Observer observer : observers) {
-			
+
 			observer.call_back(msgToForward);
 
 			try {

@@ -52,14 +52,10 @@ void setup() {
   attachInterrupt(0, interruptRoutine, FALLING);
 
   // Initialize APDS-9960 (configure I2C and initial values)
-  if ( !apds.init() ) { //if failed to init
-    mySerial.write((byte)B00000000); // will be implemented in future
-  }
+  apds.init();  
 
   // Start running the APDS-9960 gesture sensor engine
-  if ( !apds.enableGestureSensor(true) ) { //if failed to enable
-    mySerial.write((byte)B00000000); // will be implemented in future
-  }
+ apds.enableGestureSensor(true);
 }
 
 //////////////////////////LOOP/////////////////////////////////////////////////

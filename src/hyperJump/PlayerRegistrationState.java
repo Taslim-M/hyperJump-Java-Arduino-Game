@@ -1,13 +1,15 @@
 package hyperJump;
 
-public class PlayerRegistrationState implements GameState{
+public class PlayerRegistrationState implements GameState {
 
 	@Override
 	public void next(GameContext context) {
-		if(context.currentPlayerName!=null) {
-			//notify all devices to start
-			context.notifyRegistrationSuccess();
+		if (context.currentPlayerName != null) {
+			// notify all devices to start the game by broad casting Ob:1111 1111
+			context.notifyEndNodes(new msg((byte) 0b11111111));
 			context.setState(new RoundOnState());
+		} else {
+			// setplayername
 		}
 	}
 

@@ -15,8 +15,6 @@ public final class ByteDecoder {
 			invalidJumpDetected = true;
 		} else if (b == (byte) 0b000000010) {
 			validJumpDetected = true;
-		} else {
-			finalScoreReceived = true;
 		}
 
 	}

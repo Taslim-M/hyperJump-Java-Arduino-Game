@@ -27,10 +27,8 @@ public class GameContext {
 	public void stopGameOnSound() {
 		gameCoordinator.stopMainGameSound();
 	}
-	public void notifyRegistrationSuccess() {
-		gameCoordinator.notifySuccessfulRegistration();
+	public void notifyEndNodes(msg m) {
+		gameCoordinator.notifyEndNodes(m);
 	}
-	public void notifyEndGame() {
-		gameCoordinator.notifyEndGame();
-	}
+	
 }
