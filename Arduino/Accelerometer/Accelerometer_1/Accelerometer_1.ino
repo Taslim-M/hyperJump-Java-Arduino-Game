@@ -54,7 +54,7 @@ void loop() {
     //Send final point one game over.
     case 'g':
       if (gameStartingTime + timer <= millis()) { // if millisis i.e Current Time larger than or equal to the time the game started + 60000 msec
-        mySerial.write(0b00000000); // broad cast tgame over to all the devices via dispatcher
+        mySerial.write((byte)0b00000000); // broad cast tgame over to all the devices via dispatcher
         delay(100); // wait 10ms to let Java finish broadcast because java will take the message and broad cast it 10 times
         mySerial.write(score); // send final score to Java
         Acc_Context.currentState = 'o'; // change to wait state
