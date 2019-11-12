@@ -10,12 +10,13 @@ public class RoundOnState implements GameState {
 		ByteDecoder.updateFlags(context.currentMsg);
 		if (ByteDecoder.gameTimeOver) {
 			// broadcast game time over(i.e Ob: 0000 0000) to end nodes
+			context.stopGameOnSound();
 			context.notifyEndNodes(new msg((byte) 0b00000000));
 			context.setState(new ScoreboardState());// set current state to ScoreBoard
 		} else if (ByteDecoder.validJumpDetected) {
-			// feeback sound
+			context.playSuccessJumpSound(); // feeback sound
 		} else if (ByteDecoder.invalidJumpDetected) {
-			// feedback sound
+			context.playNotSuccessJumpSound(); // feedback sound
 		}
 		ByteDecoder.resetFlags();
 

@@ -30,7 +30,7 @@ public class GameCoordinator implements Observer, Runnable {
 		new Thread(this).start();
 		registerPlayers();
 	}
-
+	//Need to stop this long sound whenever the game changes from Round on state
 	public void playMainGameSound() {
 		gameMusic.startPlaying();
 	}
@@ -38,7 +38,14 @@ public class GameCoordinator implements Observer, Runnable {
 	public void stopMainGameSound() {
 		gameMusic.stopPlaying();
 	}
-	
+	//For good and bad jump, just start the sound and dont worry about stopping
+	//because they are only 1 second
+	public void playGoodJumpSound() {
+		new GameMusic().startPlaying("yay.wav");
+	}
+	public void playBadJumpSound() {
+		new GameMusic().startPlaying("ohNo.wav");
+	}
 	//Take player names from the user
 	public void registerPlayers() {
 		System.out.println("Input the Jumping Player Name");

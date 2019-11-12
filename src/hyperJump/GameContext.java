@@ -37,7 +37,12 @@ public class GameContext {
 	public void stopGameOnSound() {
 		gameCoordinator.stopMainGameSound();
 	}
-
+	public void playSuccessJumpSound() {
+		gameCoordinator.playGoodJumpSound();
+	}
+	public void playNotSuccessJumpSound() {
+		gameCoordinator.playBadJumpSound();
+	}
 	public void notifyEndNodes(msg m) {
 		gameCoordinator.notifyEndNodes(m);
 	}
