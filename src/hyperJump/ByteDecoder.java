@@ -1,10 +1,10 @@
 package hyperJump;
 
 public final class ByteDecoder {
-	public static boolean validJumpDetected, invalidJumpDetected, gameTimeOver, finalScoreReceived;
+	public static boolean validJumpDetected, invalidJumpDetected, gameTimeOver;
 
 	public static void resetFlags() {
-		validJumpDetected = invalidJumpDetected = gameTimeOver = finalScoreReceived = false;
+		validJumpDetected = invalidJumpDetected = gameTimeOver = false;
 	}
 
 	public static void updateFlags(msg m) {

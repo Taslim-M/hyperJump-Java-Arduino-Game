@@ -3,7 +3,13 @@ package hyperJump;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-
+import java.util.Scanner;
+/*
+,---.                   --.--|                       |
+|  _.,---.,-.-.,---.      |  |---.,---.,---.,---.,---|
+|   |,---|| | ||---'      |  |   ||    |---',---||   |
+`---'`---^` ' '`---'      `  `   '`    `---'`---^`---'
+*/
 public class GameCoordinator implements Observer, Runnable {
 	GameContext context;
 	ArrayList<Subject> proxies;
@@ -20,6 +26,9 @@ public class GameCoordinator implements Observer, Runnable {
 		for (Subject subject : subjects) {
 			subject.registerObserver(this);
 		}
+		//Start game thread
+		new Thread(this).start();
+		registerPlayers();
 	}
 
 	public void playMainGameSound() {
@@ -29,20 +38,28 @@ public class GameCoordinator implements Observer, Runnable {
 	public void stopMainGameSound() {
 		gameMusic.stopPlaying();
 	}
-
+	
+	//Take player names from the user
+	public void registerPlayers() {
+		System.out.println("Input the Jumping Player Name");
+		Scanner in = new Scanner(System.in);
+		String playerJumper =in.nextLine();
+		System.out.println("Input the LED Controlling Player Name");
+		String playerOpponent =in.nextLine();
+		context.updatePlayerNames(playerJumper,playerOpponent);
+	}
 	@Override
 	public void update(Object o) {
-
 	}
 
+	//will be invoked by the proxy.. used by this thread
 	@Override
 	public synchronized void call_back(msg m) {
-		
 		msgToUpdateContext = m;
 	}
 
 	public void notifyEndNodes(msg m) {
-		requestProxies(m); // to notify the other devices to start the game
+		requestProxies(m); // to notify the other devices to start/stop the game
 	}
 
 	// Request proxies to send this msg to dispatcher
@@ -51,9 +68,10 @@ public class GameCoordinator implements Observer, Runnable {
 			((Proxy) proxy).send_msg(m);
 		}
 	}
-
+	
 	@Override
 	public void run() {
+		//just check if u need to update the context
 		while (true) {
 			if (msgToUpdateContext!=null)
 				context.updateContext(msgToUpdateContext);

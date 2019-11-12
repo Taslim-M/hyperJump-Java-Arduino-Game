@@ -23,6 +23,5 @@ public class main {
 		proxyList.add(accP1);
 		proxyList.add(ledP1);
 		GameCoordinator GC = new GameCoordinator(proxyList); // pass the gameTime and serial port to Game Coordinator
-		System.out.println("Game Ended");
 	}
 }

@@ -12,20 +12,17 @@ public class ScoreboardState implements GameState {
 
 	@Override
 	public void next(GameContext context) {
-		ByteDecoder.updateFlags(context.currentMsg);
-		if (ByteDecoder.finalScoreReceived) {
-			System.out.println("Final Scores: " + (int) context.currentMsg.getPayLoad());
-			// ask the user input if the want to play another round
-			System.out.println("Please press y if you wish to play an other round ");
-			Scanner in = new Scanner(System.in);
-			char input = in.next().charAt(0);
-			if (Character.toUpperCase(input) == 'Y') {
-				context.setState(new PlayerRegistrationState());
-			}
-		} else {
-			System.out.println("Waiting for Final Scores");
+		System.out.println(context.currentJumperName + " Jumping Against " + context.currentOpponentName);
+		System.out.println("Final Scores of Jumper: " + (int) context.currentMsg.getPayLoad());
+		// ask the user input if the want to play another round
+		System.out.println("Please press y if you wish to play an other round ");
+		Scanner in = new Scanner(System.in);
+		char input = in.next().charAt(0);
+		if (Character.toUpperCase(input) == 'Y') {
+			context.resetPlayerNames();
+			context.requestPlayerNames();
+			context.setState(new PlayerRegistrationState());
 		}
-		ByteDecoder.resetFlags();
 	}
 
 	@Override
