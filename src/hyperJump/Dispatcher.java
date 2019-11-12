@@ -57,8 +57,8 @@ public class Dispatcher implements Runnable, Subject {
 		// we will use a call_back to send the message back.
 
 		while (true) {
-			// read from hardware
-			if (sph.isAvailable()) {
+			// read from hardware if available
+			if (sph.available()>0) {
 				this.currentMsg.value = sph.readByte();
 			}
 			// if read - send to correct proxy

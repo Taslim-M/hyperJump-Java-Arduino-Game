@@ -21,13 +21,13 @@ public class SerialPortHandle {
 		} // Open serial port
 
 	}
-	public boolean isAvailable()   {
+	public int available()   {
 		try {
-			return (sp.getInputBufferBytesCount() > 0);
+			return sp.getInputBufferBytesCount();
 		} catch (SerialPortException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return 0;
 	}
 	//Read one byte from the serial port
 	public Byte readByte() { 
