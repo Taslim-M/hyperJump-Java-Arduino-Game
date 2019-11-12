@@ -5,13 +5,12 @@
 SoftwareSerial mySerial(5, 6); // RX, TX
 // *****************Global variables*******************
 //Y-axis value are sent to the microcontroller on pin A2
-const int timer = 60000;
-int gameStartingTime;
 const int ypin = A2;
 //Variable for storing previous avg for Jerk Calculations
 double prevAvg = 0;
 //Variable for storing previous and present T for signalling a jump to the java program
-unsigned long  int prevT, presentT;
+unsigned long  int prevT, presentT, gameStartingTime;
+unsigned long int maxGameTime = 60000;
 // for low-pass filter - init to zero
 double dataY[3];
 
@@ -53,7 +52,7 @@ void loop() {
 
     //Send final point one game over.
     case 'g':
-      if (gameStartingTime + timer <= millis()) { // if millisis i.e Current Time larger than or equal to the time the game started + 60000 msec
+      if (millis()-gameStartingTime > maxGameTime) { // if millis (Current Time) is larger than or equal to the time the game started + 60000 msec
         mySerial.write((byte)0b00000000); // broad cast tgame over to all the devices via dispatcher
         delay(100); // wait 10ms to let Java finish broadcast because java will take the message and broad cast it 10 times
         mySerial.write(score); // send final score to Java
@@ -128,7 +127,7 @@ void evaluateJump() {
   }
 }
 void increaseScore(byte message) { // Increase score depending on speed (multiplier)
-  byte multiplier = ((message & 0b00001111) - 0b00000111);
+  byte multiplier = ((message & 0b00001111) - 0b00000111); // Start multiplier from 1 (for lowest speed)
   if (score + multiplier < 64) { //do not cross max score of 63
     score +=  multiplier;
   }
