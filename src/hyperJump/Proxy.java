@@ -2,8 +2,6 @@ package hyperJump;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 public class Proxy implements Runnable, Observer, Subject {
 	Dispatcher d; // Subject which sends to this observer
@@ -30,7 +28,7 @@ public class Proxy implements Runnable, Observer, Subject {
 	}
 
 	public void run() {
-
+		while(true) {}
 		// not used right now -> may be used in fututre use
 	}
 

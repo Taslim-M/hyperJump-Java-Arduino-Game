@@ -2,7 +2,6 @@ package hyperJump;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;
-import jssc.SerialPortTimeoutException;
 public class SerialPortHandle {
 
 	SerialPort sp;

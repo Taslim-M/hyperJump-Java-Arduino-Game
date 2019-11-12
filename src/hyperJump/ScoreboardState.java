@@ -1,6 +1,5 @@
 package hyperJump;
 
-import java.io.*;
 import java.util.Scanner;
 
 public class ScoreboardState implements GameState {
@@ -19,6 +18,7 @@ public class ScoreboardState implements GameState {
 		Scanner in = new Scanner(System.in);
 		char input = in.next().charAt(0);
 		if (Character.toUpperCase(input) == 'Y') {
+			context.notifyEndNodes(new msg((byte)0b00001111)); // Signal end nodes to go back to waiting state
 			context.resetPlayerNames();
 			context.requestPlayerNames();
 			context.setState(new PlayerRegistrationState());
