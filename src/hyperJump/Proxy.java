@@ -23,7 +23,6 @@ public class Proxy implements Runnable, Observer, Subject {
 	}
 
 	void send_msg(msg m) {
-		System.out.println("Proxy");
 		// tell the dispatcher to send your message
 		d.send_msg(this, m);
 	}
