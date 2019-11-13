@@ -36,9 +36,6 @@ public class Dispatcher implements Runnable, Subject {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
-			// Set Correct ID of the proxy to be sure end to the right person.
-			m.setID(proxy.hardwareID);
 			sph.writeByte(m.value);
 		}
 	}
