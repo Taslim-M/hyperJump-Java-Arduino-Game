@@ -7,8 +7,9 @@ public class PlayerRegistrationState implements GameState {
 		//Check for successful Player Registration
 		if (context.currentJumperName != null && context.currentOpponentName!=null) {
 			// notify all devices to start the game by broad casting Ob:1111 1111
+			context.notifyEndNodes(new msg((byte)0b11111111));
 			context.playGameOnSound();
-			context.notifyEndNodes(new msg((byte) 0b11111111));
+			System.out.println("Changing State");
 			context.setState(new RoundOnState());
 		} else {
 			System.out.println("Player names are not set. Please set them first!");

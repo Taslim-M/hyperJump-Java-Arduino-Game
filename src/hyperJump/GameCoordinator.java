@@ -18,10 +18,11 @@ public class GameCoordinator implements Observer, Runnable {
 
 	public GameCoordinator(ArrayList<Subject> subjects) {
 		this.context = new GameContext(this);
+		gameMusic = new GameMusic();
 		proxies = new ArrayList<Subject>();
 		msgToUpdateContext=null;
 		// register with all the proxy subjects
-		for (Subject subject : subjects) {
+		for (Subject subject : proxies) {
 			subject.registerObserver(this);
 		}
 		//Start game thread
@@ -59,7 +60,7 @@ public class GameCoordinator implements Observer, Runnable {
 
 	//will be invoked by the proxy.. used by this thread
 	@Override
-	public synchronized void call_back(msg m) {
+	public void call_back(msg m) {
 		msgToUpdateContext = m;
 	}
 
