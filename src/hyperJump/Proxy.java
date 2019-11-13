@@ -65,11 +65,11 @@ public class Proxy implements Runnable, Observer, Subject {
 
 	@Override
 	public void notifyObservers() {
-
+		//Using the standard syntax for notify Observers
+		//If multiple observers are added in the future (maybe for logs).. no need to change code
+		//Currently, only Game thread receives this msg
 		for (Observer observer : observers) {
-
 			observer.call_back(msgToForward);
-
 			try {
 				Debug.trace(this + " sending " + msgToForward + " to the Game Thread");
 			} catch (IOException e) {
