@@ -19,7 +19,7 @@ public class GameCoordinator implements Observer, Runnable {
 	public GameCoordinator(ArrayList<Subject> subjects) {
 		this.context = new GameContext(this);
 		gameMusic = new GameMusic();
-		availableProxies = subjects;
+		this.availableProxies = subjects;
 		msgToUpdateContext=null;
 		// register with all the proxy subjects
 		for (Subject subject : availableProxies) {
