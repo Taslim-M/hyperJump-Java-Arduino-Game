@@ -10,7 +10,7 @@ import java.util.Scanner;
 */
 public class GameCoordinator implements Observer, Runnable {
 	GameContext context;
-	ArrayList<Subject> proxies;
+	ArrayList<Subject> availableProxies;
 	msg msgToUpdateContext;
 	
 
@@ -19,10 +19,10 @@ public class GameCoordinator implements Observer, Runnable {
 	public GameCoordinator(ArrayList<Subject> subjects) {
 		this.context = new GameContext(this);
 		gameMusic = new GameMusic();
-		proxies = new ArrayList<Subject>();
+		availableProxies = subjects;
 		msgToUpdateContext=null;
 		// register with all the proxy subjects
-		for (Subject subject : proxies) {
+		for (Subject subject : availableProxies) {
 			subject.registerObserver(this);
 		}
 		//Start game thread
@@ -70,7 +70,7 @@ public class GameCoordinator implements Observer, Runnable {
 
 	// Request proxies to send this msg to dispatcher
 	public void requestProxies(msg m) {
-		for (Subject proxy : proxies) {
+		for (Subject proxy : availableProxies) {
 			((Proxy) proxy).send_msg(m);
 		}
 	}
