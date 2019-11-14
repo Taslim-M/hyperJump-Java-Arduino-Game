@@ -55,11 +55,8 @@ public class Dispatcher implements Runnable, Subject {
 
 		while (true) {
 			// read from hardware if available
-			if (sph.available()>0) {
-				this.currentMsg.value = sph.readByte();
-			}
-			// if read - send to correct proxy
-			if (currentMsg != null) {
+			if (sph.available() > 0) {
+				currentMsg = new msg(sph.readByte());
 				if (currentMsg.isBroadcastMessage()) {
 					send_msg(currentMsg);
 				} else {

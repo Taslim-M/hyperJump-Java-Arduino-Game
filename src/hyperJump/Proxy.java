@@ -3,7 +3,7 @@ package hyperJump;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Proxy implements Runnable, Observer, Subject {
+public class Proxy implements Observer, Subject {
 	Dispatcher d; // Subject which sends to this observer
 	Byte hardwareID; // hardware ID for each proxy
 	msg msgToForward;
@@ -18,23 +18,11 @@ public class Proxy implements Runnable, Observer, Subject {
 		// Initiate the fields
 
 		observers = new ArrayList<Observer>();
-		// start your thread
-		new Thread(this).start();
 	}
 
 	void send_msg(msg m) {
 		// tell the dispatcher to send your message
 		d.send_msg(this, m);
-	}
-
-	public void run() {
-		while(true) {}
-		// not used right now -> may be used in fututre use
-	}
-
-	@Override
-	public void update(Object o) {
-
 	}
 
 	@Override
@@ -51,6 +39,7 @@ public class Proxy implements Runnable, Observer, Subject {
 
 	@Override
 	public void registerObserver(Observer o) {
+		System.out.println("Game thread is registered as observer to proxy" + this.getClass());
 		observers.add(o);
 	}
 
@@ -71,7 +60,7 @@ public class Proxy implements Runnable, Observer, Subject {
 		for (Observer observer : observers) {
 			observer.call_back(msgToForward);
 			try {
-				Debug.trace(this + " sending " + msgToForward + " to the Game Thread");
+				Debug.trace(this + " sending " + msgToForward.value + " to the Game Thread");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
