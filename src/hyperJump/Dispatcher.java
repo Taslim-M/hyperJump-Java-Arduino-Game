@@ -10,7 +10,7 @@ public class Dispatcher implements Runnable, Subject {
 	ArrayList<Proxy> proxies;
 	// HashMap improves search speed
 	HashMap<Byte, Proxy> hashMap = new HashMap<Byte, Proxy>();
-
+	Object broadcastLock;
 	msg currentMsg;
 	SerialPortHandle sph;
 
@@ -18,6 +18,7 @@ public class Dispatcher implements Runnable, Subject {
 
 		// create an array list to remember proxies
 		proxies = new ArrayList<Proxy>();
+		broadcastLock = new Object();
 		// initiate the byte to null
 		currentMsg = null;
 		this.sph = sph;
@@ -29,7 +30,7 @@ public class Dispatcher implements Runnable, Subject {
 	public void send_msg(Proxy proxy, msg m) {
 		// immediate processes the message when invoked - can be shared by multiple
 		// proxies.. hence we need to synchronize this for exclusive usage
-		synchronized (this) {
+		synchronized (broadcastLock) {
 			// this message should be sent out to the appropriate hardware resource
 			try {
 				Debug.trace("Dispatcher: Message m=" + m.value + " received from " + proxy);
@@ -43,7 +44,9 @@ public class Dispatcher implements Runnable, Subject {
 	// only for direct Broadcast message - private to Dispatcher
 	private void send_msg(msg m) {
 		// this message should be sent out to the appropriate hardware resource
-		sph.writeByte(m.value);
+		synchronized (broadcastLock) {
+			sph.writeByte(m.value);
+		}
 	}
 
 	@Override
@@ -52,7 +55,6 @@ public class Dispatcher implements Runnable, Subject {
 		// when message arrives figure out who is the message
 		// intended for and send them the message
 		// we will use a call_back to send the message back.
-
 		while (true) {
 			// read from hardware if available
 			if (sph.available() > 0) {

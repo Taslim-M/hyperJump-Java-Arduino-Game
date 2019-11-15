@@ -8,6 +8,7 @@ public class Proxy implements Observer, Subject {
 	Byte hardwareID; // hardware ID for each proxy
 	msg msgToForward;
 	ArrayList<Observer> observers; // For maintaining a list of observers - Game thread(s)
+	Object callBackLock;
 
 	Proxy(Byte id, Dispatcher d) throws IOException {
 		this.d = d;
@@ -16,7 +17,7 @@ public class Proxy implements Observer, Subject {
 		// register yourself as a proxy with the dispatcher
 		d.registerObserver(this);
 		// Initiate the fields
-
+		callBackLock = new Object();
 		observers = new ArrayList<Observer>();
 	}
 
@@ -27,19 +28,20 @@ public class Proxy implements Observer, Subject {
 
 	@Override
 	public void call_back(msg m) {
-		msgToForward = m;
-		// call the game thread
-		notifyObservers(); // directly call_back the game thread
-		try {
-			Debug.trace("Message " + m.value + " received by " + this + " from dispacher");
-		} catch (IOException e) {
-			e.printStackTrace();
+		synchronized (callBackLock) {
+			msgToForward = m;
+			// call the game thread
+			notifyObservers(); // directly call_back the game thread
+			try {
+				Debug.trace("Message " + m.value + " received by " + this + " from dispacher");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	@Override
 	public void registerObserver(Observer o) {
-		System.out.println("Game thread is registered as observer to proxy" + this.getClass());
 		observers.add(o);
 	}
 
@@ -49,14 +51,14 @@ public class Proxy implements Observer, Subject {
 		if (i >= 0) {
 			observers.remove(i);
 		}
-
 	}
 
 	@Override
 	public void notifyObservers() {
-		//Using the standard syntax for notify Observers
-		//If multiple observers are added in the future (maybe for logs).. no need to change code
-		//Currently, only Game thread receives this msg
+		// Using the standard syntax for notify Observers
+		// If multiple observers are added in the future (maybe for logs).. no need to
+		// change code
+		// Currently, only Game thread receives this msg
 		for (Observer observer : observers) {
 			observer.call_back(msgToForward);
 			try {

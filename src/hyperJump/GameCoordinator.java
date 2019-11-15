@@ -13,12 +13,13 @@ public class GameCoordinator implements Observer {
 	GameContext context;
 	ArrayList<Subject> availableProxies;
 
-	Object callBackLock = new Object();
+	Object callBackLock;
 	private GameMusic gameMusic;
 
 	public GameCoordinator(ArrayList<Subject> subjects) {
 		this.context = new GameContext(this);
 		gameMusic = new GameMusic();
+		callBackLock = new Object();
 		this.availableProxies = subjects;
 		// register with all the proxy subjects
 		for (Subject subject : availableProxies) {
