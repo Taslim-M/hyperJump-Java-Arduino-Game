@@ -71,7 +71,6 @@ public class GameCoordinator implements Observer {
 
 	// Request proxies to send this msg to dispatcher
 	public void requestProxies(msg m) {
-		System.out.println("Sending msg" + m.value);
 		for (Subject proxy : availableProxies) {
 			((Proxy) proxy).send_msg(m);
 		}

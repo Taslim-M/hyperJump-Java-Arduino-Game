@@ -45,7 +45,7 @@ void loop() {
     case 'w':
       if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
       {
-        Acc_Context.message = 0b0; //reset msg for correct scoring
+        Acc_Context.message = 0b01000000; //reset msg for correct scoring
         gameStartingTime = millis(); // set starting Game Time
         Acc_Context.currentState = 'g'; // change state to gameON
       }
