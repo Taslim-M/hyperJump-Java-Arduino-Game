@@ -45,8 +45,9 @@ void loop() {
     case 'w':
       if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
       {
-        Acc_Context.currentState = 'g';
-        gameStartingTime = millis();
+        Acc_Context.message = 0b0; //reset msg for correct scoring
+        gameStartingTime = millis(); // set starting Game Time
+        Acc_Context.currentState = 'g'; // change state to gameON
       }
       break;
 
@@ -128,7 +129,7 @@ void evaluateJump() {
 }
 void increaseScore(byte message) { // Increase score depending on speed (multiplier)
   byte multiplier = ((message & 0b00001111) - 0b00000111); // Start multiplier from 1 (for lowest speed)
-  if (score + multiplier < 64) { //do not cross max score of 63
+  if (score + multiplier < 64) { //do not cross max score of 63 due to payload size
     score +=  multiplier;
   }
 }
@@ -139,5 +140,5 @@ void decreaseScore() {
 }
 
 void resetScore() {
-  score = 0;
+  score = 0; // reset score when playing another round
 }
