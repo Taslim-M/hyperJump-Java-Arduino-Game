@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 /*
-,---.                   --.--|                       |
-|  _.,---.,-.-.,---.      |  |---.,---.,---.,---.,---|
-|   |,---|| | ||---'      |  |   ||    |---',---||   |
-`---'`---^` ' '`---'      `  `   '`    `---'`---^`---'
+,---.               
+|  _.,---.,-.-.,---.
+|   |,---|| | ||---'
+`---'`---^` ' '`---'
 */
 public class GameCoordinator implements Observer {
 	GameContext context;
