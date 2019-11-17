@@ -11,8 +11,8 @@ public class main {
 		Proxy ledP1 = null;
 		try {
 			d = new Dispatcher(new SerialPortHandle("COM11"));
-			accP1 = new Proxy((byte)0,d);
-			ledP1 = new Proxy((byte)1,d);
+			accP1 = new Proxy((byte)0,d); // create a new proxy with hardware id 0 (accelerometer)
+			ledP1 = new Proxy((byte)1,d);// create a new proxy with hardware id 1 (LED)
 
 		} catch (IOException e) {
 			e.printStackTrace();
