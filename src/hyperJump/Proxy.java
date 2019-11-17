@@ -8,7 +8,6 @@ public class Proxy implements Observer, Subject {
 	Byte hardwareID; // hardware ID for each proxy
 	msg msgToForward;
 	ArrayList<Observer> observers; // For maintaining a list of observers - Game thread(s)
-	Object callBackLock;
 
 	Proxy(Byte id, Dispatcher d) throws IOException {
 		this.d = d;
@@ -28,7 +27,6 @@ public class Proxy implements Observer, Subject {
 
 	@Override
 	public void call_back(msg m) {
-		synchronized (callBackLock) {
 			msgToForward = m;
 			// call the game thread
 			notifyObservers(); // directly call_back the game thread
@@ -37,7 +35,6 @@ public class Proxy implements Observer, Subject {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		}
 	}
 
 	@Override
