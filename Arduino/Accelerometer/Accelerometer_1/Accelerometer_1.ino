@@ -45,7 +45,7 @@ void loop() {
     case 'w':
       if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
       {
-        Acc_Context.message = 0b0; //reset msg for correct scoring
+        Acc_Context.message = 0b01000000; //reset msg for correct scoring
         gameStartingTime = millis(); // set starting Game Time
         Acc_Context.currentState = 'g'; // change state to gameON
       }
@@ -72,12 +72,8 @@ void loop() {
 
         // [5]if a jump is detected (i.e jerk>=5) and no signal for jump has been transmitted in the last one second then send a signal
         if (jerk >= 5 && (presentT > (prevT + 1000))) {
-
-          evaluateJump();
-
           // update score and signal to java so that java can intensify the sound
-          //mySerial.write(B00001111); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 1111->successful jump
-
+          evaluateJump();
           // store the present time for sending a byte for the next valid jump
           prevT = presentT;
         } // end jump detected
@@ -118,7 +114,7 @@ double convertToJerk(double currentAvg, double &prevAvg) {
 
 //Evaluate jump
 void evaluateJump() {
-  if (((Acc_Context.message & B01000000) != 0) and ((Acc_Context.message & B00001111) != 0) ) { //ensure msg is from current user device
+  if (((Acc_Context.message & B01000000) != 0) and ((Acc_Context.message & B00001111) != 0) ) { //ensure msg is for current user device
     mySerial.write(B00000010); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0010-> correct jump
     increaseScore(Acc_Context.message );
   }

@@ -18,12 +18,9 @@ public final class ByteDecoder {
 		else if (b == (byte) 0b00000001) {
 			invalidJumpDetected = true;
 		} 
-		 
 		// if the byte ==2 -> valid Jump so turn on validJumpDetected flag
 		else if (b == (byte) 0b000000010) {
 			validJumpDetected = true;
 		}
-
 	}
-
 }
