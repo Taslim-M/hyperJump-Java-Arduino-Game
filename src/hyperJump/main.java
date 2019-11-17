@@ -9,19 +9,19 @@ public class main {
 		Dispatcher d ;
 		
 		// Create new GameCoordinator
-		Proxy accP1 = null;
+		Proxy accP1 = null; 
 		Proxy ledP1 = null;
 		try {
 			d = new Dispatcher(new SerialPortHandle("COM11"));
-			accP1 = new Proxy((byte)0,d);
-			ledP1 = new Proxy((byte)1,d);
+			accP1 = new Proxy((byte)0,d); // create a new proxy with id 0  for accelerometer.
+			ledP1 = new Proxy((byte)1,d);  // create a new proxy with if 1 for LED.
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		ArrayList<Subject> proxyList = new ArrayList<Subject>();
-		proxyList.add(accP1);
-		proxyList.add(ledP1);
+		proxyList.add(accP1); // add accelerometer proxy to the list of proxies.
+		proxyList.add(ledP1); // add led proxy to the list of proxies.
 		GameCoordinator GC = new GameCoordinator(proxyList); // pass the gameTime and serial port to Game Coordinator
 	}
 }
