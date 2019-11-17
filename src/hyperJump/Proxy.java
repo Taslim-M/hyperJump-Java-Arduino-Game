@@ -16,7 +16,7 @@ public class Proxy implements Observer, Subject {
 		// register yourself as a proxy with the dispatcher
 		d.registerObserver(this);
 		// Initiate the fields
-	
+
 		observers = new ArrayList<Observer>();
 	}
 
@@ -27,14 +27,14 @@ public class Proxy implements Observer, Subject {
 
 	@Override
 	public void call_back(msg m) {
-			msgToForward = m;
-			// call the game thread
-			notifyObservers(); // directly call_back the game thread
-			try {
-				Debug.trace("Message " + m.value + " received by " + this + " from dispacher");
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		msgToForward = m;
+		// call the game thread
+		notifyObservers(); // directly call_back the game thread
+		try {
+			Debug.trace("Message " + m.value + " received by " + this + " from dispacher");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
