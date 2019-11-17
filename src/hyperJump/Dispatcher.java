@@ -84,7 +84,7 @@ public class Dispatcher implements Runnable, Subject {
 
 	@Override
 	public void removeObserver(Observer o) {
-		// remove from the list and the hashmap
+		// remove the observer from the list of proxies and the hashmap
 		int i = proxies.indexOf((Proxy) o);
 		if (i >= 0) {
 			hashMap.remove(proxies.get(i).hardwareID);
