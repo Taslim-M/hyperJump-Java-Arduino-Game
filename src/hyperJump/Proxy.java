@@ -16,7 +16,7 @@ public class Proxy implements Observer, Subject {
 		// register yourself as a proxy with the dispatcher
 		d.registerObserver(this);
 		// Initiate the fields
-		callBackLock = new Object();
+	
 		observers = new ArrayList<Observer>();
 	}
 
