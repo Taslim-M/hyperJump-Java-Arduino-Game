@@ -4,9 +4,13 @@
 // declare pins 5 and 6 on arduino for transmission and reception respectively
 SoftwareSerial mySerial(5, 6); // RX, TX
 // *****************Global variables*******************
-#define w 0
-#define g 1
-#define o 2
+#define WAIT 0b000000001
+#define GAME_ON 0b00000010
+#define GAME_OVER 0b00000011
+#define START_MSG 0b11111111
+#define END_MSG 0b00000000
+#define ANOTHER_ROUND 0b00001111
+#define RESET_MSG 0b01000000
 
 //Y-axis value are sent to the microcontroller on pin A2
 const int ypin = A2;
@@ -23,7 +27,7 @@ byte score; // to maintain score
 //Context for states to decide
 struct Context {
   byte currentState; // w -> wait State, g-> game-ON State, o-> game Over State
-  byte message = 0b00000000;
+  byte message = END_MSG;
 };
 Context Acc_Context;
 
@@ -35,7 +39,7 @@ void setup() {
   prevAvg = dataY[0] = dataY[1] = dataY[2] = convertToG(analogRead(ypin));
   // initialize to current time
   presentT = prevT = millis();
-  Acc_Context.currentState = 'w'; // initially the current state is wait to start
+  Acc_Context.currentState = WAIT; // initially the current state is wait to start
   score = 0;
 }
 
@@ -46,22 +50,22 @@ void loop() {
   }
   //State Design Pattern
   switch (Acc_Context.currentState) {
-    case w:
-      if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
+    case WAIT:
+      if (Acc_Context.message == START_MSG) //if Java sent 1111 1111 - game started so change state to game on
       {
-        Acc_Context.message = 0b01000000; //reset msg for correct scoring
+        Acc_Context.message = RESET_MSG; //reset msg for correct scoring
         gameStartingTime = millis(); // set starting Game Time
-        Acc_Context.currentState = 'g'; // change state to gameON
+        Acc_Context.currentState = GAME_ON; // change state to gameON
       }
       break;
 
     //Send final point one game over.
-    case g:
+    case GAME_ON:
       if (millis()-gameStartingTime > maxGameTime) { // if millis (Current Time) is larger than or equal to the time the game started + 60000 msec
-        mySerial.write((byte)0b00000000); // broad cast tgame over to all the devices via dispatcher
+        mySerial.write((byte)END_MSG); // broad cast tgame over to all the devices via dispatcher
         delay(100); // wait 10ms to let Java finish broadcast because java will take the message and broad cast it 10 times
         mySerial.write(score); // send final score to Java
-        Acc_Context.currentState = 'o'; // change to wait state
+        Acc_Context.currentState = GAME_OVER; // change to wait state
       }
       else { // if no state change - do the processing
         dataY[2] = convertToG(analogRead(ypin));
@@ -84,10 +88,10 @@ void loop() {
 
         delay(10);// constant delay between the readings
       }
-    case o:
-      if (Acc_Context.message == 0b00001111) {
+    case GAME_OVER:
+      if (Acc_Context.message == ANOTHER_ROUND) {
         resetScore();
-        Acc_Context.currentState = 'w'; // change to wait state
+        Acc_Context.currentState = WAIT; // change to wait state
       }
       break;
   }//end switch
