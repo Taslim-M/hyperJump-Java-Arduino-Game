@@ -4,6 +4,10 @@
 // declare pins 5 and 6 on arduino for transmission and reception respectively
 SoftwareSerial mySerial(5, 6); // RX, TX
 // *****************Global variables*******************
+#define w 0
+#define g 1
+#define o 2
+
 //Y-axis value are sent to the microcontroller on pin A2
 const int ypin = A2;
 //Variable for storing previous avg for Jerk Calculations
@@ -18,7 +22,7 @@ byte score; // to maintain score
 
 //Context for states to decide
 struct Context {
-  char currentState; // w -> wait State, g-> game-ON State, o-> game Over State
+  byte currentState; // w -> wait State, g-> game-ON State, o-> game Over State
   byte message = 0b00000000;
 };
 Context Acc_Context;
@@ -42,7 +46,7 @@ void loop() {
   }
   //State Design Pattern
   switch (Acc_Context.currentState) {
-    case 'w':
+    case w:
       if (Acc_Context.message == 0b11111111) //if Java sent 1111 1111 - game started so change state to game on
       {
         Acc_Context.message = 0b01000000; //reset msg for correct scoring
@@ -52,7 +56,7 @@ void loop() {
       break;
 
     //Send final point one game over.
-    case 'g':
+    case g:
       if (millis()-gameStartingTime > maxGameTime) { // if millis (Current Time) is larger than or equal to the time the game started + 60000 msec
         mySerial.write((byte)0b00000000); // broad cast tgame over to all the devices via dispatcher
         delay(100); // wait 10ms to let Java finish broadcast because java will take the message and broad cast it 10 times
@@ -80,7 +84,7 @@ void loop() {
 
         delay(10);// constant delay between the readings
       }
-    case 'o':
+    case o:
       if (Acc_Context.message == 0b00001111) {
         resetScore();
         Acc_Context.currentState = 'w'; // change to wait state

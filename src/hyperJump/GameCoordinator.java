@@ -60,7 +60,8 @@ public class GameCoordinator implements Observer {
 	// will be invoked by the proxy
 	@Override
 	public void call_back(msg m) {
-		synchronized (callBackLock) {
+		// synchronized so that only one proxy can use the call_back function of the game co-ordinator at one time
+		synchronized (callBackLock) {  
 			context.updateContext(m);
 		}
 	}
@@ -72,7 +73,7 @@ public class GameCoordinator implements Observer {
 	// Request proxies to send this msg to dispatcher
 	public void requestProxies(msg m) {
 		for (Subject proxy : availableProxies) {
-			((Proxy) proxy).send_msg(m);
+			((Proxy) proxy).send_msg(m); 
 		}
 	}
 

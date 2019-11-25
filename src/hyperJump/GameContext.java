@@ -23,7 +23,7 @@ public class GameContext {
 		this.currentMsg = m;
 		currentState.next(this);
 	}
-	public void updatePlayerNames(String jumper, String opponent) {
+	public void updatePlayerNames(String jumper, String opponent) { // stores the player names
 		this.currentJumperName=jumper;
 		this.currentOpponentName=opponent;
 		currentState.next(this);
