@@ -10,7 +10,7 @@ SoftwareSerial mySerial(5, 6); // RX, TX
 #define START_MSG 0b11111111
 #define END_MSG 0b00000000
 #define ANOTHER_ROUND 0b00001111
-#define RESET_MSG 0b01000000
+#define RESET_MSG 0b01000000 // only player id and no data
 
 //Y-axis value are sent to the microcontroller on pin A2
 const int ypin = A2;
@@ -27,7 +27,7 @@ byte score; // to maintain score
 //Context for states to decide
 struct Context {
   byte currentState; // w -> wait State, g-> game-ON State, o-> game Over State
-  byte message = END_MSG;
+  byte message = RESET_MSG;
 };
 Context Acc_Context;
 
