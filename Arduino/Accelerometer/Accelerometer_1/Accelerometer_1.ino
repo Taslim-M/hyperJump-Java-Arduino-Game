@@ -4,7 +4,7 @@
 // declare pins 5 and 6 on arduino for transmission and reception respectively
 SoftwareSerial mySerial(5, 6); // RX, TX
 // *****************Global variables*******************
-#define WAIT 0b000000001
+#define WAIT 0b00000001
 #define GAME_ON 0b00000010
 #define GAME_OVER 0b00000011
 #define START_MSG 0b11111111

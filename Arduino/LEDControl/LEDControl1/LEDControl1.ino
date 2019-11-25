@@ -10,13 +10,22 @@ SoftwareSerial mySerial(4, 3); // RX, TX
 #define DATA_PIN 7 // LED Data PIN
 
 
-// Global Variables
+//***************** Global Variables*********************
+#define WAIT 0b00000001
+#define CRITICAL_REGION 0b00000010
+#define NON_CRITICAL_REGION 0b00000011
+#define GAME_OVER 0b00000100
+#define START_MSG 0b11111111
+#define END_MSG 0b00000000
+#define ANOTHER_ROUND 0b00001111
+
+
 SparkFun_APDS9960 apds = SparkFun_APDS9960();
 int isr_flag = 0; //initial interrupt flag
 
 //Context- used by States to determine change
 struct Context {
-  char currentState = 'w';
+  byte currentState = WAIT;
   byte message;
   int index = random(15, 100); //  selecting random position to start- ensure in non-critical region
 
@@ -77,17 +86,17 @@ void loop() {
 
 
   switch (LED_Context.currentState) {
-    case 'w': // if current state is Pre Animation
-      if (LED_Context.message == 0b11111111) { // if game started signal received
-        LED_Context.currentState = 'n';      //  change current-state to non-critical region
+    case WAIT: // if current state is Pre Animation
+      if (LED_Context.message == START_MSG) { // if game started signal received
+        LED_Context.currentState = NON_CRITICAL_REGION;      //  change current-state to non-critical region
       }
       break;
 
-    case 'n': // if current state is Pre Animation
-      if (LED_Context.message == 0b00000000) { //if game ended signal received
+    case NON_CRITICAL_REGION: // if current state is Pre Animation
+      if (LED_Context.message == END_MSG) { //if game ended signal received
         fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
         FastLED.show();
-        LED_Context.currentState = 'o';  // change state to game over
+        LED_Context.currentState = GAME_OVER;  // change state to game over
       }
       else if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
         /* XY00CDDD
@@ -97,17 +106,17 @@ void loop() {
             DDD = the getByte(int)function -> takes the speed, returns the appropriate data to send to the java
         */
         mySerial.write(getByteCode(LED_Context.speed)); // broadcast message= entering critical region with a speed
-        LED_Context.currentState = 'c'; // change current-state to critical region
+        LED_Context.currentState = CRITICAL_REGION; // change current-state to critical region
       }
       //light up 3 leds at the index
       lightLED(LED_Context.index);
       break;
 
-    case 'c':// if current state is Critical
-      if (LED_Context.message == B00000000) {  //if game ended signal received
+    case CRITICAL_REGION:// if current state is Critical
+      if (LED_Context.message == END_MSG) {  //if game ended signal received
         fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
         FastLED.show();
-        LED_Context.currentState = 'o';  // change current-state to game over state
+        LED_Context.currentState = GAME_OVER;  // change current-state to game over state
       }
       else  if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
 
@@ -118,18 +127,18 @@ void loop() {
             DDD = 000 for LED outside the critical region
         */
         mySerial.write((byte)B01000000);// broadcast  message= exiting critical region
-        LED_Context.currentState = 'n';// change current-state to non-critical region
+        LED_Context.currentState = NON_CRITICAL_REGION;// change current-state to non-critical region
       }
       //light up 3 leds at the index
       lightLED(LED_Context.index);
       break;
 
-    case 'o':
+    case GAME_OVER:
 
-      if (LED_Context.message == 0b00001111) { // B00001111-> another round needs to be played
+      if (LED_Context.message == ANOTHER_ROUND) { // B00001111-> another round needs to be played
         resetConfiguration(); // reset configuration
         preGameAnimation();
-        LED_Context.currentState = 'w'; // change current state to wait to start state
+        LED_Context.currentState = WAIT; // change current state to wait to start state
       }
 
       break;
