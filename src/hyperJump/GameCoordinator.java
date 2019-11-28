@@ -14,7 +14,7 @@ public class GameCoordinator implements Observer {
 	ArrayList<Subject> availableProxies;
 
 	Object callBackLock;
-	private GameMusic gameMusic;
+	public GameMusic gameMusic;
 
 	public GameCoordinator(ArrayList<Subject> subjects) {
 		this.context = new GameContext(this);
