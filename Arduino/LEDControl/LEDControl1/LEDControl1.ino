@@ -20,6 +20,15 @@ SoftwareSerial mySerial(4, 3); // RX, TX
 #define ANOTHER_ROUND 0b00001111
 
 
+//Window Size will be dynamically updated to change behavior
+//When the score (by accelerometer) crosses a certain threshold and specific amount of time has passed
+//It will request LED to change window size to smaller (increase difficulty)
+int windowSize = 4; //Default size
+void smallerWindowSize(){
+  windowSize=2;
+}
+
+
 SparkFun_APDS9960 apds = SparkFun_APDS9960();
 int isr_flag = 0; //initial interrupt flag
 
@@ -39,10 +48,6 @@ struct Context {
 Context LED_Context;
 CRGB leds[NUM_LEDS]; // define array of 119 LEDS  for individual addressing in the loop
 
-// w = wait to start state
-// n = nonCriticalState
-// c = criticalState
-// o = gameOver
 void setup() {
 
   //LED setup by inserting model, data pin and controls
@@ -97,8 +102,8 @@ void loop() {
         fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
         FastLED.show();
         LED_Context.currentState = GAME_OVER;  // change state to game over
-      }
-      else if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
+      } // if the Led index is critical region-- the extra 1 compensates for any delay in communcation
+      else if (( LED_Context.index == (118-windowSize-1) || (LED_Context.index == windowSize+1)) {
         /* XY00CDDD
             X -Player Id =0 for player 1
             Y = 1 for device is LED
@@ -150,13 +155,13 @@ void loop() {
 //CRGB( GREEN, RED , BLUE )
 void lightLED(int index) { // takes the index and turns the led of the index and 3 leds before and after the index to Deep Red
   fill_solid( leds, NUM_LEDS, CRGB(10, 150, 10)); // pink background
-  for (int k = index - 3; k <= index + 3; k++) {
+  for (int k = index - windowSize; k <= index + windowSize; k++) {
     leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB(0, 0, 255); // Deep Blue
   }
 
   FastLED.show();// flushes the color on the led strip immediately
   // clear this led for the next time around the loop
-  for (int k = index - 3; k <= index + 3; k++) {
+  for (int k = index - windowSize; k <= index + windowSize; k++) {
     leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB::Black;
   }
   //Delay controls the speed of the loop motion
