@@ -23,15 +23,17 @@ SoftwareSerial mySerial(4, 3); // RX, TX
 //Window Size will be dynamically updated to change behavior
 //When the score (by accelerometer) crosses a certain threshold and specific amount of time has passed
 //It will request LED to change window size to smaller (increase difficulty)
-int windowSize = 0; //Default size-- 4 LEds light up around the index
-void smallerWindowSize() {
-  windowSize = 2;
+//int windowSize = 0; //Default size-- 4 LEds light up around the index
+int smallerWindowSize() {
+  //windowSize = 2;
+  return 2;
 }
-void largerWindowSize() {
-  windowSize = 4;
+int largerWindowSize() {
+ // windowSize = 4;
+  return 4;
 }
 //Function pointer - initially point to larger window size
-void (*setWindowSize)()=largerWindowSize;
+int (*WindowSize)()=largerWindowSize;
 
 SparkFun_APDS9960 apds = SparkFun_APDS9960();
 int isr_flag = 0; //initial interrupt flag
@@ -74,7 +76,7 @@ void setup() {
 
   // Start running the APDS-9960 gesture sensor engine
   apds.enableGestureSensor(true);
-  setWindowSize();
+  
 }
 
 //////////////////////////LOOP/////////////////////////////////////////////////
@@ -107,7 +109,7 @@ void loop() {
         FastLED.show();
         LED_Context.currentState = GAME_OVER;  // change state to game over
       }
-      else if ( LED_Context.index == (118 - windowSize - 1) || (LED_Context.index == windowSize + 1)) {
+      else if ( LED_Context.index == (118 - WindowSize() - 1) || (LED_Context.index == WindowSize() + 1)) {
         // if the Led index is critical region-- the extra 1 compensates for any delay in communcation
 
         /* XY00CDDD
@@ -121,8 +123,8 @@ void loop() {
       }
       //Dynamically adjust Window Size - change function pointer
       if (LED_Context.message == INCREASE_DIFFICULTY) { //if player is too good
-        setWindowSize = smallerWindowSize;
-        setWindowSize();
+        WindowSize = smallerWindowSize;
+       
       }
       //light up 3 leds at the index
       lightLED(LED_Context.index);
@@ -147,8 +149,8 @@ void loop() {
       }
       //Dynamically adjust Window Size - change function pointer
       if (LED_Context.message == INCREASE_DIFFICULTY) { //if player is too good
-        setWindowSize = smallerWindowSize;
-        setWindowSize();
+        WindowSize = smallerWindowSize;
+       
       }
       //light up 3 leds at the index
       lightLED(LED_Context.index);
@@ -171,13 +173,13 @@ void loop() {
 //CRGB( GREEN, RED , BLUE )
 void lightLED(int index) { // takes the index and turns the led of the index and 3 leds before and after the index to Deep Red
   fill_solid( leds, NUM_LEDS, CRGB(10, 150, 10)); // pink background
-  for (int k = index - windowSize; k <= index + windowSize; k++) {
+  for (int k = index - WindowSize(); k <= index + WindowSize(); k++) {
     leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB(0, 0, 255); // Deep Blue
   }
 
   FastLED.show();// flushes the color on the led strip immediately
   // clear this led for the next time around the loop
-  for (int k = index - windowSize; k <= index + windowSize; k++) {
+  for (int k = index - WindowSize(); k <= index + WindowSize(); k++) {
     leds[(k + NUM_LEDS) % NUM_LEDS] = CRGB::Black;
   }
   //Delay controls the speed of the loop motion
