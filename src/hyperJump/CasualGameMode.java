@@ -21,4 +21,11 @@ public class CasualGameMode extends GameMode{
 				"                                                      ");
 	}
 
+	@Override
+	public void displayResult(int score, String jumperName, String opponentName) {
+		System.out.println("Winner or Loser does not matter, we had fun :))");
+		System.out.println(jumperName+ " Jumping Against " +opponentName);
+		System.out.println("Final Scores of Jumper: " + score);
+	}
+
 }

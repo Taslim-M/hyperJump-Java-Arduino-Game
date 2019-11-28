@@ -15,7 +15,7 @@ public class GameCoordinator implements Observer {
 
 	Object callBackLock;
 	public GameMusic gameMusic;
-
+	GameMode gameMode;
 	public GameCoordinator(ArrayList<Subject> subjects) {
 		this.context = new GameContext(this);
 		gameMusic = new GameMusic();
@@ -27,12 +27,20 @@ public class GameCoordinator implements Observer {
 		}
 		registerPlayers();
 	}
-
-	// Need to stop this long sound whenever the game changes from Round on state
-	public void playMainGameSound() {
-		gameMusic.startPlaying();
+	//Game Modes can be updated Dynamically
+	public void casualGameMode() {
+		setGameMode(new CasualGameMode(this));
 	}
-
+	public void competitiveGameMode() {
+		setGameMode(new CompetitiveGameMode(this));
+	}
+	private void setGameMode(GameMode gameMode) {
+		this.gameMode=gameMode;
+	}
+	public void evaluatePlayers(int score, String jumper,String controller) {
+		gameMode.evaluatePlayer(score, jumper, controller);
+	}
+	// Need to stop this long sound whenever the game changes from Round on state
 	public void stopMainGameSound() {
 		gameMusic.stopPlaying();
 	}
@@ -45,6 +53,9 @@ public class GameCoordinator implements Observer {
 
 	public void playBadJumpSound() {
 		new GameMusic().startPlaying("ohNo.wav");
+	}
+	public void playRoundOverState() {
+		new GameMusic().startPlaying("roundOver.wav");
 	}
 
 	// Take player names from the user
@@ -70,11 +81,9 @@ public class GameCoordinator implements Observer {
 		requestProxies(m); // to notify the other devices to start/stop the game
 	}
 
-	// Request proxies to send this msg to dispatcher
+	// Request proxies to send this msg to dispatcher - Since it's a broadcast- sending only one is enough
 	public void requestProxies(msg m) {
-		for (Subject proxy : availableProxies) {
-			((Proxy) proxy).send_msg(m); 
-		}
+		((Proxy)availableProxies.get(0)).send_msg(m);
 	}
 
 }

@@ -1,22 +1,41 @@
 package hyperJump;
+
 //Template Method is used here
 public abstract class GameMode {
 	GameCoordinator gC;
+
 	public GameMode(GameCoordinator gC) {
-		this.gC=gC;
+		this.gC = gC;
+		// Every time a gameMode is created, the game starter method is also called
+		gameStarter();
 	}
-	//Templated Method on how to Initialize Game
+
+	// Templated Method on how to Initialize Game
 	final public void gameStarter() {
-		notifyEndNodes();
+		notifyStartEndNodes();
 		displayInfo();
 		startSound();
 	}
-	private void notifyEndNodes() {
-		gC.notifyEndNodes(new msg((byte)0b11111111));
+
+	// send Start_Game msg according to Protocol table
+	private void notifyStartEndNodes() {
+		gC.notifyEndNodes(new msg((byte) 0b11111111));
 	}
+
 	public abstract void displayInfo();
+
 	public abstract void startSound();
-	
-	//Templated Method on how to Handle End Score
-	
+
+	// Templated Method on how to Handle End Score
+
+	final public void evaluatePlayer(int score, String jumperName, String opponentName) {
+		announcement();
+		displayResult(score, jumperName, opponentName);
+	}
+
+	public void announcement() {
+		gC.playRoundOverState();
+	}
+
+	public abstract void displayResult(int score, String jumperName, String opponentName);
 }
