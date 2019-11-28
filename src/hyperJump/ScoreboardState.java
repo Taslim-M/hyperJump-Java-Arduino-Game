@@ -14,6 +14,8 @@ public class ScoreboardState implements GameState {
 		
 		//Evaluate the players depending on difficulty mode selected
 //		context.decideWinner((int)context.currentMsg.getPayLoad(), context.currentJumperName, context.currentOpponentName);
+		
+		//Remove these 2 lines and keep top line only .. after testing start
 		System.out.println(context.currentJumperName + " Jumping Against " + context.currentOpponentName);
 		System.out.println("Final Scores of Jumper: " + (int) context.currentMsg.getPayLoad());
 		// ask the user input if the want to play another round
