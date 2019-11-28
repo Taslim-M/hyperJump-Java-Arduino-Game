@@ -190,6 +190,7 @@ void lightLED(int index) { // takes the index and turns the led of the index and
 }
 //Reset for next Round
 void resetConfiguration() {
+  windowSize=largerWindowSize;
   LED_Context.speed = 50;
   LED_Context.clockwise = false;
   LED_Context.index = random(15, 100);  // to ensure that the game always starts in the critical region
