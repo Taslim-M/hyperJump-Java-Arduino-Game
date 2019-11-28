@@ -18,16 +18,20 @@ SoftwareSerial mySerial(4, 3); // RX, TX
 #define START_MSG 0b11111111
 #define END_MSG 0b00000000
 #define ANOTHER_ROUND 0b00001111
-
+#define INCREASE_DIFFICULTY 0b01000000
 
 //Window Size will be dynamically updated to change behavior
 //When the score (by accelerometer) crosses a certain threshold and specific amount of time has passed
 //It will request LED to change window size to smaller (increase difficulty)
-int windowSize = 4; //Default size
-void smallerWindowSize(){
-  windowSize=2;
+int windowSize = 0; //Default size-- 4 LEds light up around the index
+void smallerWindowSize() {
+  windowSize = 2;
 }
-
+void largerWindowSize() {
+  windowSize = 4;
+}
+//Function pointer - initially point to larger window size
+void (*setWindowSize)()=largerWindowSize;
 
 SparkFun_APDS9960 apds = SparkFun_APDS9960();
 int isr_flag = 0; //initial interrupt flag
@@ -66,10 +70,11 @@ void setup() {
   attachInterrupt(0, interruptRoutine, FALLING);
 
   // Initialize APDS-9960 (configure I2C and initial values)
-  apds.init();  
+  apds.init();
 
   // Start running the APDS-9960 gesture sensor engine
- apds.enableGestureSensor(true);
+  apds.enableGestureSensor(true);
+  setWindowSize();
 }
 
 //////////////////////////LOOP/////////////////////////////////////////////////
@@ -77,7 +82,6 @@ void loop() {
   if (mySerial.available()) { //check for the beginning and end of game
     LED_Context.message = (byte)mySerial.read(); // read the Data sent as byte -update Context.msg
   }
-
   //ensure index is valid
   LED_Context.index = ( LED_Context.index + NUM_LEDS) % NUM_LEDS; // to continue looping correctly
 
@@ -103,9 +107,9 @@ void loop() {
         FastLED.show();
         LED_Context.currentState = GAME_OVER;  // change state to game over
       }
-      else if ( LED_Context.index == (118-windowSize-1) || (LED_Context.index == windowSize+1)) {
-         // if the Led index is critical region-- the extra 1 compensates for any delay in communcation
-     
+      else if ( LED_Context.index == (118 - windowSize - 1) || (LED_Context.index == windowSize + 1)) {
+        // if the Led index is critical region-- the extra 1 compensates for any delay in communcation
+
         /* XY00CDDD
             X -Player Id =0 for player 1
             Y = 1 for device is LED
@@ -114,6 +118,11 @@ void loop() {
         */
         mySerial.write(getByteCode(LED_Context.speed)); // broadcast message= entering critical region with a speed
         LED_Context.currentState = CRITICAL_REGION; // change current-state to critical region
+      }
+      //Dynamically adjust Window Size - change function pointer
+      if (LED_Context.message == INCREASE_DIFFICULTY) { //if player is too good
+        setWindowSize = smallerWindowSize;
+        setWindowSize();
       }
       //light up 3 leds at the index
       lightLED(LED_Context.index);
@@ -135,6 +144,11 @@ void loop() {
         */
         mySerial.write((byte)B01000000);// broadcast  message= exiting critical region
         LED_Context.currentState = NON_CRITICAL_REGION;// change current-state to non-critical region
+      }
+      //Dynamically adjust Window Size - change function pointer
+      if (LED_Context.message == INCREASE_DIFFICULTY) { //if player is too good
+        setWindowSize = smallerWindowSize;
+        setWindowSize();
       }
       //light up 3 leds at the index
       lightLED(LED_Context.index);
