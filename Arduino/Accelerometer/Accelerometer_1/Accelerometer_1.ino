@@ -11,8 +11,8 @@ SoftwareSerial mySerial(5, 6); // RX, TX
 #define END_MSG 0b00000000
 #define ANOTHER_ROUND 0b00001111
 #define RESET_MSG 0b01000000 // only player id and no data
-#define INCREASE_DIFFICULTY 0b01000000
-#define THRESHOLD_SCORE 15 
+#define INCREASE_DIFFICULTY 0b01110000
+#define THRESHOLD_SCORE 10 
 
 //Y-axis value are sent to the microcontroller on pin A2
 const int ypin = A2;
@@ -94,7 +94,7 @@ void loop() {
       }
     case GAME_OVER:
       if (Acc_Context.message == ANOTHER_ROUND) {
-        resetScore();
+        resetStats();
         Acc_Context.currentState = WAIT; // change to wait state
       }
       break;
@@ -155,6 +155,7 @@ void decreaseScore() {
   }
 }
 
-void resetScore() {
+void resetStats() {
   score = 0; // reset score when playing another round
+  signaledOnce=false;
 }

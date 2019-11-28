@@ -18,7 +18,7 @@ SoftwareSerial mySerial(4, 3); // RX, TX
 #define START_MSG 0b11111111
 #define END_MSG 0b00000000
 #define ANOTHER_ROUND 0b00001111
-#define INCREASE_DIFFICULTY 0b01000000
+#define INCREASE_DIFFICULTY 0b01110000
 
 //Window Size will be dynamically updated to change behavior
 //When the score (by accelerometer) crosses a certain threshold and specific amount of time has passed
