@@ -102,8 +102,10 @@ void loop() {
         fill_solid( leds, NUM_LEDS, CRGB(0, 200, 0)); //Fill color after animation -> sets all LEDs to red
         FastLED.show();
         LED_Context.currentState = GAME_OVER;  // change state to game over
-      } // if the Led index is critical region-- the extra 1 compensates for any delay in communcation
-      else if (( LED_Context.index == (118-windowSize-1) || (LED_Context.index == windowSize+1)) {
+      }
+      else if ( LED_Context.index == (118-windowSize-1) || (LED_Context.index == windowSize+1)) {
+         // if the Led index is critical region-- the extra 1 compensates for any delay in communcation
+     
         /* XY00CDDD
             X -Player Id =0 for player 1
             Y = 1 for device is LED
