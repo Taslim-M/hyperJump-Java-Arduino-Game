@@ -45,7 +45,7 @@ struct Context {
   int speed = 50; //starting speed
   const int maxSpeed = 10; //maximize the speed by minimizing the  delay between transitions is 10 ms
   const int minSpeed = 60; // minimize the speed by setting  delay to max value ->60msec
-  const int topFocusIndex = 58; //the index at top focal centre  of loop
+  const int topFocusIndex = 59; //the index at top focal centre  of loop
   bool clockwise = false; //initial direction anticlockwise
 };
 
@@ -134,7 +134,7 @@ void loop() {
         FastLED.show();
         LED_Context.currentState = GAME_OVER;  // change current-state to game over state
       }
-      else  if (( LED_Context.index == 114) || (LED_Context.index == 5)) { // if the Led index is 115/5
+      else  if ( LED_Context.index == (118 - windowSize() - 1) || (LED_Context.index == windowSize() + 1)) {
 
         /* XY00CDDD
             X -Player Id =0 for player 1
