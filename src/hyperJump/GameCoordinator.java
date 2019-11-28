@@ -54,8 +54,8 @@ public class GameCoordinator implements Observer {
 	public void playBadJumpSound() {
 		new GameMusic().startPlaying("ohNo.wav");
 	}
-	public void playRoundOverState() {
-		new GameMusic().startPlaying("roundOver.wav");
+	public void playAnnouncement() {
+		new GameMusic().startPlaying("dundundun.wav");
 	}
 
 	// Take player names from the user

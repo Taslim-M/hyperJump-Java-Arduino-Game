@@ -34,7 +34,7 @@ public abstract class GameMode {
 	}
 
 	public void announcement() {
-		gC.playRoundOverState();
+		gC.playAnnouncement();
 	}
 
 	public abstract void displayResult(int score, String jumperName, String opponentName);
