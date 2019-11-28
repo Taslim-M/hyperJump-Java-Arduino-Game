@@ -25,11 +25,9 @@ SoftwareSerial mySerial(4, 3); // RX, TX
 //It will request LED to change window size to smaller (increase difficulty)
 //int windowSize = 0; //Default size-- 4 LEds light up around the index
 int smallerWindowSize() {
-  //windowSize = 2;
   return 2;
 }
 int largerWindowSize() {
- // windowSize = 4;
   return 4;
 }
 //Function pointer - initially point to larger window size
