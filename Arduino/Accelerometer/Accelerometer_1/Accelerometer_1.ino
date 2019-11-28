@@ -11,6 +11,8 @@ SoftwareSerial mySerial(5, 6); // RX, TX
 #define END_MSG 0b00000000
 #define ANOTHER_ROUND 0b00001111
 #define RESET_MSG 0b01000000 // only player id and no data
+#define INCREASE_DIFFICULTY 0b01000000
+#define THRESHOLD_SCORE 15 
 
 //Y-axis value are sent to the microcontroller on pin A2
 const int ypin = A2;
@@ -19,11 +21,12 @@ double prevAvg = 0;
 //Variable for storing previous and present T for signalling a jump to the java program
 unsigned long  int prevT, presentT, gameStartingTime;
 unsigned long int maxGameTime = 60000;
+unsigned long int gameHalfTime= 30000;
 // for low-pass filter - init to zero
 double dataY[3];
 
 byte score; // to maintain score
-
+bool signaledOnce;// boolean to check if LED has been signalled to increase difficulty
 //Context for states to decide
 struct Context {
   byte currentState; // w -> wait State, g-> game-ON State, o-> game Over State
@@ -41,6 +44,7 @@ void setup() {
   presentT = prevT = millis();
   Acc_Context.currentState = WAIT; // initially the current state is wait to start
   score = 0;
+  signaledOnce= false;
 }
 
 //***********************Loop***********************
@@ -130,6 +134,14 @@ void evaluateJump() {
     mySerial.write(B00000001); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0001->wrong jump
     decreaseScore();
   }
+ // if time is greater than half time and score has increase to the expected threashold then 
+ // signal the LED to increase difficulty
+ if ((!signaledOnce)&&(millis()-gameStartingTime > gameHalfTime)&& (score>= THRESHOLD_SCORE)) { 
+  
+    mySerial.write((byte)INCREASE_DIFFICULTY);
+    signaledOnce= true; //change to true because LED is already infomed to increase difficulty
+ }
+   
 }
 void increaseScore(byte message) { // Increase score depending on speed (multiplier)
   byte multiplier = ((message & 0b00001111) - 0b00000111); // Start multiplier from 1 (for lowest speed)
