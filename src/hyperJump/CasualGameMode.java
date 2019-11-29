@@ -1,6 +1,6 @@
 package hyperJump;
 
-public class CasualGameMode extends GameMode{
+public class CasualGameMode extends GameMode {
 
 	public CasualGameMode(GameCoordinator gC) {
 		super(gC);
@@ -13,19 +13,19 @@ public class CasualGameMode extends GameMode{
 
 	@Override
 	public void displayInfo() {
-		System.out.println("                                                      \r\n" + 
-				",---.                    |        ,---.               \r\n" + 
-				"|    ,---.,---..   .,---.|        |  _.,---.,-.-.,---.\r\n" + 
-				"|    ,---|`---.|   |,---||        |   |,---|| | ||---'\r\n" + 
-				"`---'`---^`---'`---'`---^`---'    `---'`---^` ' '`---'\r\n" + 
-				"                                                      ");
+		System.out.println("                                                      \r\n"
+				+ ",---.                    |        ,---.               \r\n"
+				+ "|    ,---.,---..   .,---.|        |  _.,---.,-.-.,---.\r\n"
+				+ "|    ,---|`---.|   |,---||        |   |,---|| | ||---'\r\n"
+				+ "`---'`---^`---'`---'`---^`---'    `---'`---^` ' '`---'\r\n"
+				+ "                                                      ");
 	}
 
 	@Override
 	public void displayResult(int score, String jumperName, String opponentName) {
 		System.out.println("Winner or Loser does not matter, we had fun :))");
-		System.out.println(jumperName+ " Jumping Against " +opponentName);
-		System.out.println("Final Scores of Jumper: " + score);
+		System.out.println(jumperName + " Jumping Against " + opponentName);
+		System.out.println("Final Scores of " + jumperName + ": " + score);
 	}
 
 }

@@ -23,7 +23,7 @@ public class CompetitiveGameMode extends GameMode {
 				"\\     \\____(  <_> )|  Y Y  \\|  |_> >\\  ___/  |  |  |  | |  |  |  | \\   / \\  ___/ \r\n" + 
 				" \\______  / \\____/ |__|_|  /|   __/  \\___  > |__|  |__| |__|  |__|  \\_/   \\___  >\r\n" + 
 				"        \\/               \\/ |__|         \\/                                   \\/ ");
-		System.out.println("To beat your opponent - Score more than "+scoreToBeat + " points");
+		System.out.println("To beat your opponent - Score more than 20 points");
 	}
 
 	@Override

@@ -12,7 +12,7 @@ public class PlayerRegistrationState implements GameState {
 			System.out.println("Press 1 to select Casual Game, Press 2 to select Competitive Game");
 			Scanner in = new Scanner(System.in);
 			String ans= in.nextLine(); // Wait for enter from user
-			if(ans =="1") {
+			if(Integer.parseInt(ans) ==1) {
 				context.setCasualGameMode();
 			}else {
 				context.setCompetitiveGameMode();
