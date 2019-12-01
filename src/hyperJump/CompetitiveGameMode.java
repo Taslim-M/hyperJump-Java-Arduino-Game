@@ -2,12 +2,14 @@ package hyperJump;
 
 public class CompetitiveGameMode extends GameMode {
 	private Integer scoreToBeat;
-
+	public static int competitiveRoundNo=0;
 	public CompetitiveGameMode(GameCoordinator gC) {
 		super(gC);
-		scoreToBeat = 20;
-	}
-
+		
+		competitiveRoundNo++;
+		// every time the player plays a competitive round, score to beat increases
+	scoreToBeat = 18  + (competitiveRoundNo*2); 
+}
 	@Override
 	public void startSound() {
 		//Playing Eye of the Tiger for Competitive mode
@@ -23,7 +25,7 @@ public class CompetitiveGameMode extends GameMode {
 				"\\     \\____(  <_> )|  Y Y  \\|  |_> >\\  ___/  |  |  |  | |  |  |  | \\   / \\  ___/ \r\n" + 
 				" \\______  / \\____/ |__|_|  /|   __/  \\___  > |__|  |__| |__|  |__|  \\_/   \\___  >\r\n" + 
 				"        \\/               \\/ |__|         \\/                                   \\/ ");
-		System.out.println("To beat your opponent - Score more than 20 points");
+		System.out.println("To beat your opponent - Score more than "+ scoreToBeat+ " points");
 	}
 
 	@Override
