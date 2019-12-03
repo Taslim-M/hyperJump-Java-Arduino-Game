@@ -35,10 +35,11 @@ public class CompetitiveGameMode extends GameMode {
 	@Override
 	public void displayResult(int score, String jumperName, String opponentName) {
 		System.out.println("Good Game ! But there can only be one winner");
+		System.out.println("Score to beat was:" + scoreToBeat );
 		if (score > this.scoreToBeat) {
-			System.out.println(jumperName + " HAS WON THE GAME!!!!!!!!!!");
+			System.out.println(jumperName + " HAS WON THE GAME!!!!!!!!!! by scoring " + score);
 		} else {
-			System.out.println(opponentName + " HAS WON THE GAME!!!!!!!!!!");
+			System.out.println(opponentName + " HAS WON THE GAME!!!!!!!!!! The jumper only scored " +score);
 		}
 	}
 
