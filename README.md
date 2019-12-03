@@ -2,6 +2,9 @@
 A dual-player version of the classic arcade game Jumping Jackpot, implemented using Arduino and Java.
 
 In Java, please add jssc-2.9.0.jar in your Build path to launch.
+
+jssc file can be found inside lib. The communication between Arduino and Java is done through XBee Coordinator and SerialPort. Can work in both windows and Mac, as long as correctly used.
+
 ***
 ### Overall Hardware Architecture:
 
