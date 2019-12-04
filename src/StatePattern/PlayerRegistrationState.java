@@ -1,4 +1,4 @@
-package hyperJump;
+package StatePattern;
 
 import java.util.Scanner;
 

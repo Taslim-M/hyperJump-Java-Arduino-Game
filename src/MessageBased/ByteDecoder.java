@@ -1,4 +1,4 @@
-package hyperJump;
+package MessageBased;
 
 public final class ByteDecoder {
 	public static boolean validJumpDetected, invalidJumpDetected, gameTimeOver;

@@ -1,4 +1,4 @@
-package hyperJump;
+package Music;
 
 import java.io.File;
 import java.io.IOException;

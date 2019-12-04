@@ -1,8 +1,10 @@
-package hyperJump;
+package MessageBased;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import hyperJump.Debug;
 
 public class Dispatcher implements Runnable, Subject {
 
@@ -14,7 +16,7 @@ public class Dispatcher implements Runnable, Subject {
 	msg currentMsg;
 	SerialPortHandle sph;
 
-	Dispatcher(SerialPortHandle sph) throws FileNotFoundException {
+	public Dispatcher(SerialPortHandle sph) throws FileNotFoundException {
 
 		// create an array list to remember proxies
 		proxies = new ArrayList<Proxy>();

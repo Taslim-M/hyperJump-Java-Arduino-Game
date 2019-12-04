@@ -1,4 +1,7 @@
-package hyperJump;
+package GameModes;
+
+import MessageBased.msg;
+import hyperJump.GameCoordinator;
 
 //Template Method is used here
 public abstract class GameMode {

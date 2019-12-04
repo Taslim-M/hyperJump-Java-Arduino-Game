@@ -1,4 +1,4 @@
-package hyperJump;
+package MessageBased;
 
 import jssc.SerialPort;
 import jssc.SerialPortException;

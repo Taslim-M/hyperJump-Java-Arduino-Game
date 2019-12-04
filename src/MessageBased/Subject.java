@@ -1,4 +1,4 @@
-package hyperJump;
+package MessageBased;
 
 public interface Subject {
 	public void registerObserver(Observer o);

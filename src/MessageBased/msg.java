@@ -1,10 +1,10 @@
-package hyperJump;
+package MessageBased;
 
 public class msg {
 
-	byte value;
+	public byte value;
 
-	msg(byte m) {
+	public msg(byte m) {
 		this.value = m;
 	}
 

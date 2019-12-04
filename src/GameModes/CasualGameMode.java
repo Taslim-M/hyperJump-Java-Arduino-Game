@@ -1,4 +1,6 @@
-package hyperJump;
+package GameModes;
+
+import hyperJump.GameCoordinator;
 
 public class CasualGameMode extends GameMode {
 

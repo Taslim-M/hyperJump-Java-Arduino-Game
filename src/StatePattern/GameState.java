@@ -1,4 +1,4 @@
-package hyperJump;
+package StatePattern;
 
 public interface GameState {
 	public void next(GameContext context);
