@@ -6,8 +6,6 @@ public abstract class GameMode {
 
 	public GameMode(GameCoordinator gC) {
 		this.gC = gC;
-		// Every time a gameMode is created, the game starter method is also called
-		gameStarter();
 	}
 
 	// Templated Method on how to Initialize Game

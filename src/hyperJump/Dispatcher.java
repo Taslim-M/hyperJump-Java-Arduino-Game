@@ -61,11 +61,13 @@ public class Dispatcher implements Runnable, Subject {
 				currentMsg = new msg(sph.readByte());
 				if (currentMsg.isBroadcastMessage()) {
 					send_msg(currentMsg);
+					System.out.println(currentMsg.value);
 				} else {
 					notifyObservers();
 				}
 			}
 		}
+		
 	}
 
 	@Override

@@ -1,4 +1,11 @@
-
+/*
+  _   _           _       _   _                    _ 
+ | \ | |   ___   | |_    | | | |  ___    ___    __| |
+ |  \| |  / _ \  | __|   | | | | / __|  / _ \  / _` |
+ | |\  | | (_) | | |_    | |_| | \__ \ |  __/ | (_| |
+ |_| \_|  \___/   \__|    \___/  |___/  \___|  \__,_|
+                                                     
+*/
 // include SoftwareSerial library for wireless communication using xbee pro
 #include <SoftwareSerial.h>
 // declare pins 5 and 6 on arduino for transmission and reception respectively

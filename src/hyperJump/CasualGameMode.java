@@ -4,6 +4,8 @@ public class CasualGameMode extends GameMode {
 
 	public CasualGameMode(GameCoordinator gC) {
 		super(gC);
+		// Every time a gameMode is created, the game starter method is also called
+		gameStarter();
 	}
 
 	@Override
