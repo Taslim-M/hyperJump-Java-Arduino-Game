@@ -1,9 +1,8 @@
-
 // include SoftwareSerial library for wireless communication using xbee pro
 #include <SoftwareSerial.h>
 // declare pins 5 and 6 on arduino for transmission and reception respectively
 SoftwareSerial mySerial(5, 6); // RX, TX
-// *****************Global variables*******************
+// ******Global variables******
 #define WAIT 0b00000001
 #define GAME_ON 0b00000010
 #define GAME_OVER 0b00000011
@@ -12,7 +11,7 @@ SoftwareSerial mySerial(5, 6); // RX, TX
 #define ANOTHER_ROUND 0b00001111
 #define RESET_MSG 0b01000000 // only player id and no data
 #define INCREASE_DIFFICULTY 0b01110000
-#define THRESHOLD_SCORE 10 
+#define THRESHOLD_SCORE 10
 
 //Y-axis value are sent to the microcontroller on pin A2
 const int ypin = A2;
@@ -21,7 +20,7 @@ double prevAvg = 0;
 //Variable for storing previous and present T for signalling a jump to the java program
 unsigned long  int prevT, presentT, gameStartingTime;
 unsigned long int maxGameTime = 60000;
-unsigned long int gameHalfTime= 30000;
+unsigned long int gameHalfTime = 30000;
 // for low-pass filter - init to zero
 double dataY[3];
 
@@ -34,20 +33,20 @@ struct Context {
 };
 Context Acc_Context;
 
-//***********************Setup***********************
+//********Setup********
 void setup() {
   // initialize the serial communications:
   mySerial.begin(9600);
   // initialize all values to the first reading on y pin
-  prevAvg = dataY[0] = dataY[1] = dataY[2] = normalizeToZero(analogRead(ypin));
+  prevAvg = dataY[0] = dataY[1] = dataY[2] = convertToG(analogRead(ypin));
   // initialize to current time
   presentT = prevT = millis();
   Acc_Context.currentState = WAIT; // initially the current state is wait to start
   score = 0;
-  signaledOnce= false;
+  signaledOnce = false;
 }
 
-//***********************Loop***********************
+//********Loop********
 void loop() {
   if (mySerial.available()) { //check for the beginning and end of game
     Acc_Context.message = (byte)mySerial.read(); // read the Data sent as byte
@@ -65,14 +64,14 @@ void loop() {
 
     //Send final point one game over.
     case GAME_ON:
-      if (millis()-gameStartingTime > maxGameTime) { // if millis (Current Time) is larger than or equal to the time the game started + 60000 msec
+      if (millis() - gameStartingTime > maxGameTime) { // if millis (Current Time) is larger than or equal to the time the game started + 60000 msec
         mySerial.write((byte)END_MSG); // broad cast tgame over to all the devices via dispatcher
         delay(100); // wait 10ms to let Java finish broadcast because java will take the message and broad cast it 10 times
         mySerial.write(score); // send final score to Java
         Acc_Context.currentState = GAME_OVER; // change to wait state
       }
       else { // if no state change - do the processing
-        dataY[2] = normalizeToZero(analogRead(ypin));
+        dataY[2] = convertToG(analogRead(ypin));
         // [2]store the time when the value was read
         presentT = millis();
 
@@ -101,7 +100,7 @@ void loop() {
   }//end switch
 }
 
-//******************Functions**********************
+//*******Functions*******
 
 
 //calculate the average of 3 values
@@ -111,9 +110,9 @@ inline double movingAverage(double &data0, double &data1, const double &data2) {
   return data1 = avg; // storing the  current average
 }
 // This function is optional but is used because it simplifies calculations and makes it easier to detect a jump.
-// scales the value down and normalizes it w.r.t zero  
-inline double normalizeToZero(int value) {
-  return (0.01 * value) - 6.2;  //  return  a normalized value;
+// scales the value down
+inline double convertToG(int value) {
+  return (0.01 * value) - 6.2;  //  return  the G value;
 }
 
 //convert value to jerk
@@ -134,14 +133,14 @@ void evaluateJump() {
     mySerial.write(B00000001); //00001111 XY00ZZZZ -> X represent player ID, Y is the Accelerometer id, 0001->wrong jump
     decreaseScore();
   }
- // if time is greater than half time and score has increase to the expected threashold then 
- // signal the LED to increase difficulty
- if ((!signaledOnce)&&(millis()-gameStartingTime > gameHalfTime)&& (score>= THRESHOLD_SCORE)) { 
-  
+  // if time is greater than half time and score has increase to the expected threashold then
+  // signal the LED to increase difficulty
+  if ((!signaledOnce) && (millis() - gameStartingTime > gameHalfTime) && (score >= THRESHOLD_SCORE)) {
+
     mySerial.write((byte)INCREASE_DIFFICULTY);
-    signaledOnce= true; //change to true because LED is already infomed to increase difficulty
- }
-   
+    signaledOnce = true; //change to true because LED is already infomed to increase difficulty
+  }
+
 }
 void increaseScore(byte message) { // Increase score depending on speed (multiplier)
   byte multiplier = ((message & 0b00001111) - 0b00000111); // Start multiplier from 1 (for lowest speed)
@@ -157,5 +156,5 @@ void decreaseScore() {
 
 void resetStats() {
   score = 0; // reset score when playing another round
-  signaledOnce=false;
+  signaledOnce = false;
 }
