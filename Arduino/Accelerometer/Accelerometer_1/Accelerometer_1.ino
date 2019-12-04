@@ -39,7 +39,7 @@ void setup() {
   // initialize the serial communications:
   mySerial.begin(9600);
   // initialize all values to the first reading on y pin
-  prevAvg = dataY[0] = dataY[1] = dataY[2] = convertToG(analogRead(ypin));
+  prevAvg = dataY[0] = dataY[1] = dataY[2] = normalizeToZero(analogRead(ypin));
   // initialize to current time
   presentT = prevT = millis();
   Acc_Context.currentState = WAIT; // initially the current state is wait to start
@@ -72,7 +72,7 @@ void loop() {
         Acc_Context.currentState = GAME_OVER; // change to wait state
       }
       else { // if no state change - do the processing
-        dataY[2] = convertToG(analogRead(ypin));
+        dataY[2] = normalizeToZero(analogRead(ypin));
         // [2]store the time when the value was read
         presentT = millis();
 
@@ -110,10 +110,10 @@ inline double movingAverage(double &data0, double &data1, const double &data2) {
   data0 = data1;
   return data1 = avg; // storing the  current average
 }
-
-//convert value to G
-inline double convertToG(int value) {
-  return (0.01 * value) - 6.2;  //  return  G value;
+// This function is optional but is used because it simplifies calculations and makes it easier to detect a jump.
+// scales the value down and normalizes it w.r.t zero  
+inline double normalizeToZero(int value) {
+  return (0.01 * value) - 6.2;  //  return  a normalized value;
 }
 
 //convert value to jerk
