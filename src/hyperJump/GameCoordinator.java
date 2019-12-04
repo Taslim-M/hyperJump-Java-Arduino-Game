@@ -3,13 +3,8 @@ package hyperJump;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import GameModes.CasualGameMode;
-import GameModes.CompetitiveGameMode;
-import GameModes.GameMode;
-import MessageBased.Observer;
-import MessageBased.Proxy;
-import MessageBased.Subject;
-import MessageBased.msg;
+import GameModes.*;
+import MessageBased.*;
 import Music.GameMusic;
 import StatePattern.GameContext;
 
