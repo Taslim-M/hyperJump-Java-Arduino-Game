@@ -1,7 +1,9 @@
-package hyperJump;
+package MessageBased;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import hyperJump.Debug;
 
 public class Proxy implements Observer, Subject {
 	Dispatcher d; // Subject which sends to this observer
@@ -9,7 +11,7 @@ public class Proxy implements Observer, Subject {
 	msg msgToForward;
 	ArrayList<Observer> observers; // For maintaining a list of observers - Game thread(s)
 
-	Proxy(Byte id, Dispatcher d) throws IOException {
+	public Proxy(Byte id, Dispatcher d) throws IOException {
 		this.d = d;
 		// Read ID Mask
 		this.hardwareID = id;
@@ -20,7 +22,7 @@ public class Proxy implements Observer, Subject {
 		observers = new ArrayList<Observer>();
 	}
 
-	void send_msg(msg m) {
+	public void send_msg(msg m) {
 		// tell the dispatcher to send your message
 		d.send_msg(this, m);
 	}

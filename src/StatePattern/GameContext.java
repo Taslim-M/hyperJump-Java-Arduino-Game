@@ -1,4 +1,7 @@
-package hyperJump;
+package StatePattern;
+
+import MessageBased.msg;
+import hyperJump.GameCoordinator;
 
 public class GameContext {
 	public msg currentMsg;

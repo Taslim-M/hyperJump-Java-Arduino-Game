@@ -1,4 +1,7 @@
-package hyperJump;
+package StatePattern;
+
+import MessageBased.ByteDecoder;
+import MessageBased.msg;
 
 public class RoundOnState implements GameState {
 

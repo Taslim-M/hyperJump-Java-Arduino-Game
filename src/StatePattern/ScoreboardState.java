@@ -1,6 +1,8 @@
-package hyperJump;
+package StatePattern;
 
 import java.util.Scanner;
+
+import MessageBased.msg;
 
 public class ScoreboardState implements GameState {
 	boolean playAnotherRound;

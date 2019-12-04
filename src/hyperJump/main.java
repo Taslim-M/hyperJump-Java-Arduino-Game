@@ -3,6 +3,11 @@ package hyperJump;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import MessageBased.Dispatcher;
+import MessageBased.Proxy;
+import MessageBased.SerialPortHandle;
+import MessageBased.Subject;
+
 public class main {
 	public static void main(String[] args) {
 		// Create new Serial Port Handler

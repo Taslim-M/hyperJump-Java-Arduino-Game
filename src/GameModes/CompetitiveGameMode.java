@@ -1,6 +1,8 @@
-package hyperJump;
+package GameModes;
 
 import java.util.Random;
+
+import hyperJump.GameCoordinator;
 
 public class CompetitiveGameMode extends GameMode {
 	private Integer scoreToBeat;

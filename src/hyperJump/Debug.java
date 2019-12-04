@@ -12,7 +12,7 @@ public class Debug {
 	static void tracefile(String s) throws FileNotFoundException {
 		f = new BufferedOutputStream(new FileOutputStream(s));
 	}
-	static void trace(String s) throws IOException {
+	public static void trace(String s) throws IOException {
 		System.out.println(s);
 		if(f!=null) {
 			f.write(s.getBytes());
