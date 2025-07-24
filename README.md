@@ -1,6 +1,8 @@
 # hyperJump
 A dual-player version of the classic arcade game Jumping Jackpot, implemented using Arduino and Java.
 
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](https://opensource.org/licenses/MIT)  
+
 Game Demonstration : https://youtu.be/2nZ9i6_SRnA
 In Java, please add jssc-2.9.0.jar in your Build path to launch.
 
